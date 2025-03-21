@@ -1,6 +1,8 @@
+import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 import 'package:sehattek_app/presentation/router/router.dart';
 
@@ -18,8 +20,19 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: router,
+    return Sizer(
+      builder: (context, orientation, deviceType) => MaterialApp.router(
+        routerConfig: router,
+        builder: (context, child) => ResponsiveBreakpoints.builder(
+          breakpoints: [
+            const Breakpoint(start: 0, end: 450, name: MOBILE),
+            const Breakpoint(start: 451, end: 800, name: TABLET),
+            const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+            const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+          ],
+          child: child!,
+        ),
+      ),
     );
   }
 }
