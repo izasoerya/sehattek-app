@@ -1,3 +1,4 @@
+import 'package:sehattek_app/presentation/layout/theme.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -22,12 +23,13 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Sizer(
       builder: (context, orientation, deviceType) => MaterialApp.router(
+        theme: AppTheme.lightTheme,
         routerConfig: router,
         builder: (context, child) => ResponsiveBreakpoints.builder(
           breakpoints: [
-            const Breakpoint(start: 0, end: 450, name: MOBILE),
+            const Breakpoint(start: 0, end: 1279, name: MOBILE),
             const Breakpoint(start: 451, end: 800, name: TABLET),
-            const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+            const Breakpoint(start: 1280, end: 1920, name: DESKTOP),
             const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
           ],
           child: child!,
