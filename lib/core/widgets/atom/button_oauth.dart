@@ -15,11 +15,10 @@ class ButtonOauth extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 40,
+      height: 35,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.5)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
           backgroundColor: ThemeData().colorScheme.secondary,
         ),
         onPressed: onPressed,
