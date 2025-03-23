@@ -54,13 +54,13 @@ class _TextInputState extends State<TextInput> {
                   .textTheme
                   .bodySmall!
                   .copyWith(fontWeight: FontWeight.w600),
-              children: [
-                if (!widget.optional)
-                  TextSpan(
-                    text: ' (*)',
-                    style: TextStyle(color: Colors.red),
-                  ),
-              ],
+              // children: [
+              //   if (!widget.optional)
+              //     TextSpan(
+              //       text: ' (*)',
+              //       style: TextStyle(color: Colors.red),
+              //     ),
+              // ],
             ),
           ),
           labelStyle: Theme.of(context).textTheme.bodySmall,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sehattek_app/presentation/layout/theme.dart';
 
 class CommonLayout extends StatelessWidget {
   final Widget child;
