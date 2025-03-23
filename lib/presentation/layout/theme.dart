@@ -5,7 +5,7 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
     primarySwatch: Colors.blue,
-    scaffoldBackgroundColor: Colors.lightBlueAccent,
+    scaffoldBackgroundColor: const Color.fromRGBO(220, 234, 254, 1),
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.blue,
       foregroundColor: Colors.white,
@@ -14,12 +14,12 @@ class AppTheme {
     textTheme: TextTheme(
       bodyLarge: TextStyle(
         color: Colors.black,
-        fontSize: 18.sp,
+        fontSize: 14.sp,
         fontWeight: FontWeight.bold,
       ),
       bodyMedium: TextStyle(
         color: Colors.black54,
-        fontSize: 14.sp,
+        fontSize: 10.sp,
         fontWeight: FontWeight.w600,
       ),
       bodySmall: TextStyle(color: Colors.black54, fontSize: 1.8.h),
