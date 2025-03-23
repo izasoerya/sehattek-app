@@ -21,7 +21,6 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Flexible(
           child: Center(
@@ -81,7 +80,10 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
                   ButtonOauth(
                     label: const Text('Google'),
                     icon: Icons.g_translate_outlined,
-                    onPressed: () {},
+                    onPressed: () {
+                      print("email: ${_email.text}");
+                      print("password: ${_password.text}");
+                    },
                   ),
                 ],
               ),
@@ -105,7 +107,7 @@ class AuthSeparator extends StatelessWidget {
         children: [
           Expanded(
             child: Divider(
-              color: Colors.grey.withOpacity(0.5),
+              color: Colors.grey.withValues(alpha: 0.5),
               thickness: 1,
             ),
           ),
@@ -118,7 +120,7 @@ class AuthSeparator extends StatelessWidget {
           ),
           Expanded(
             child: Divider(
-              color: Colors.grey.withOpacity(0.5),
+              color: Colors.grey.withValues(alpha: 0.5),
               thickness: 1,
             ),
           ),
