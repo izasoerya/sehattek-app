@@ -34,14 +34,22 @@ class _ToggleButtonGeneralState extends State<ToggleButtonGeneral> {
           children: [
             Icon(Icons.person, size: 15),
             const SizedBox(width: 7.5),
-            Text('Admin'),
+            Text('Admin',
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: _isAdmin ? Colors.white : Colors.blueAccent,
+                      fontWeight: FontWeight.bold,
+                    )),
           ],
         ),
         Row(
           children: [
             Icon(Icons.person, size: 15),
             const SizedBox(width: 7.5),
-            Text('Provider'),
+            Text('Provider',
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: _isAdmin ? Colors.blueAccent : Colors.white,
+                      fontWeight: FontWeight.bold,
+                    )),
           ],
         ),
       ],

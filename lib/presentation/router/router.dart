@@ -34,8 +34,10 @@ final router = GoRouter(
     if (state.fullPath == '/dashboard' &&
         BlocProvider.of<AuthenticationBloc>(context).state is! UserLoggedIn) {
       return '/login';
+    } else if (state.fullPath == '/login' &&
+        BlocProvider.of<AuthenticationBloc>(context).state is UserLoggedIn) {
+      return '/dashboard';
     }
-    return '/login';
   },
   routes: [
     GoRoute(

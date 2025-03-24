@@ -53,9 +53,13 @@ class AppTheme {
       elevation: 0,
     ),
     textTheme: TextTheme(
-      bodyMedium:
-          TextStyle(color: Colors.white, fontSize: 2.h), // Responsive font size
-      bodySmall: TextStyle(color: Colors.white70, fontSize: 1.9.h),
+      bodyLarge: TextStyle(
+        color: Colors.white,
+        fontSize: 14.sp,
+        fontWeight: FontWeight.bold,
+      ),
+      bodyMedium: TextStyle(color: Colors.white, fontSize: 12.sp),
+      bodySmall: TextStyle(color: Colors.white70, fontSize: 10.sp),
     ),
     buttonTheme: const ButtonThemeData(
       buttonColor: Colors.blue,
