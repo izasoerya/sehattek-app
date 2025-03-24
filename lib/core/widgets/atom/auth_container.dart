@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-class HeroCard extends StatelessWidget {
+class AuthContainer extends StatelessWidget {
   final Widget child;
   final double? width;
   final double? height;
 
-  const HeroCard({super.key, required this.child, this.width, this.height});
+  const AuthContainer(
+      {super.key, required this.child, this.width, this.height});
 
   @override
   Widget build(BuildContext context) {

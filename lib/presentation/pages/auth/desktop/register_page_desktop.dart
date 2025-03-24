@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sehattek_app/core/utils/textfield_validator.dart';
 import 'package:sehattek_app/core/widgets/atom/button_general.dart';
-import 'package:sehattek_app/core/widgets/atom/hero_card.dart';
+import 'package:sehattek_app/core/widgets/atom/auth_container.dart';
 import 'package:sehattek_app/core/widgets/atom/text_button_general.dart';
 import 'package:sehattek_app/core/widgets/atom/text_input.dart';
 import 'package:sehattek_app/core/widgets/atom/toggle_button_general.dart';
@@ -31,7 +31,7 @@ class _RegisterPageDesktopState extends State<RegisterPageDesktop> {
       children: [
         Flexible(
           child: Center(
-            child: HeroCard(
+            child: AuthContainer(
               height: 450,
               child: Form(
                 key: _formKey, // Form key to handle validation
