@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:sehattek_app/core/widgets/atom/button_general.dart';
 import 'package:sehattek_app/core/widgets/atom/button_oauth.dart';
+import 'package:sehattek_app/core/widgets/atom/text_button_general.dart';
 import 'package:sehattek_app/core/widgets/atom/text_input.dart';
 import 'package:sehattek_app/core/widgets/atom/toggle_button_general.dart';
 import 'package:sehattek_app/core/widgets/molecule/footer.dart';
+import 'package:sehattek_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:sehattek_app/presentation/blocs/auth/auth_event.dart';
 import 'package:sehattek_app/presentation/router/router.dart';
-import 'package:sizer/sizer.dart';
 
 class LoginPageDesktop extends StatefulWidget {
   const LoginPageDesktop({super.key});
@@ -71,6 +73,12 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
                     hintText: 'Password',
                     type: TextInputType.visiblePassword,
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButtonGeneral(text: 'Lupa Sandi?', onPressed: () {}),
+                    ],
+                  ),
                   const Spacer(),
                   ButtonGeneral(
                     label: const Text('Login'),
@@ -78,9 +86,11 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
                   ),
                   const AuthSeparator(),
                   ButtonOauth(
-                    label: const Text('Google'),
+                    label: 'Google',
                     icon: Icons.g_translate_outlined,
-                    onPressed: () {
+                    onPressed: () async {
+                      final res = AuthenticationBloc()
+                          .add(LoginEvent(_email.text, _password.text));
                       print("email: ${_email.text}");
                       print("password: ${_password.text}");
                     },

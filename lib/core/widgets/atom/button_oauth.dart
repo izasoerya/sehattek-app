@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ButtonOauth extends StatelessWidget {
-  final Text label;
+  final String label;
   final IconData? icon;
   final void Function()? onPressed;
 
@@ -19,7 +19,9 @@ class ButtonOauth extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          backgroundColor: ThemeData().colorScheme.secondary,
+          backgroundColor: Colors.transparent,
+          side: BorderSide(color: Colors.grey.shade400),
+          elevation: 0,
         ),
         onPressed: onPressed,
         child: Row(
@@ -27,7 +29,13 @@ class ButtonOauth extends StatelessWidget {
           children: [
             if (icon != null) Icon(icon),
             SizedBox(width: icon != null ? 10 : 0),
-            label,
+            Text(
+              label,
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
           ],
         ),
       ),
