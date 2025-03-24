@@ -28,70 +28,72 @@ class _TextInputState extends State<TextInput> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 40,
-      child: TextFormField(
-        key: _formKey,
-        keyboardType: widget.type,
-        controller: widget.controller,
-        style: Theme.of(context)
-            .textTheme
-            .bodySmall!
-            .copyWith(fontWeight: FontWeight.w600),
-        decoration: InputDecoration(
-          focusColor: Colors.red,
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 1.sw,
-            vertical: 0.5.sh,
-          ),
-          hintText: widget.hintText,
-          hintStyle: Theme.of(context).textTheme.bodyMedium,
-          labelText: null,
-          label: RichText(
-            text: TextSpan(
-              text: widget.label,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall!
-                  .copyWith(fontWeight: FontWeight.w600),
-              // children: [
-              //   if (!widget.optional)
-              //     TextSpan(
-              //       text: ' (*)',
-              //       style: TextStyle(color: Colors.red),
-              //     ),
-              // ],
+    return TextFormField(
+      key: _formKey,
+      keyboardType: widget.type,
+      controller: widget.controller,
+      style: Theme.of(context)
+          .textTheme
+          .bodySmall!
+          .copyWith(fontWeight: FontWeight.w600),
+      decoration: InputDecoration(
+        focusColor: Colors.red,
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: 1.sw,
+          vertical: 0.5.sh,
+        ),
+        constraints: BoxConstraints(minHeight: 40, maxHeight: 60),
+        errorStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
+              color: Colors.red,
+              fontSize: 1.5.h,
             ),
-          ),
-          labelStyle: Theme.of(context).textTheme.bodySmall,
-          filled: true,
-          fillColor: Theme.of(context).colorScheme.secondary,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(7.5),
-            borderSide: BorderSide(
-              color: Colors.grey.withOpacity(0.3), // Grey with 7.50% opacity
-            ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(7.5),
-            borderSide: BorderSide(
-              color: Colors.grey.withOpacity(0.3), // Grey with 7.50% opacity
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(7.5),
-            borderSide: BorderSide(
-              color: Colors.grey.withOpacity(0.3), // Grey with 7.50% opacity
-            ),
+        hintText: widget.hintText,
+        hintStyle: Theme.of(context).textTheme.bodyMedium,
+        labelText: null,
+        label: RichText(
+          text: TextSpan(
+            text: widget.label,
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall!
+                .copyWith(fontWeight: FontWeight.w600),
+            // children: [
+            //   if (!widget.optional)
+            //     TextSpan(
+            //       text: ' (*)',
+            //       style: TextStyle(color: Colors.red),
+            //     ),
+            // ],
           ),
         ),
-        validator: widget.validator,
-        onChanged: (value) {
-          _formKey.currentState?.validate();
-        },
-        maxLines: null,
-        minLines: 1,
+        labelStyle: Theme.of(context).textTheme.bodySmall,
+        filled: true,
+        fillColor: Theme.of(context).colorScheme.secondary,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(7.5),
+          borderSide: BorderSide(
+            color: Colors.grey.withOpacity(0.3), // Grey with 7.50% opacity
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(7.5),
+          borderSide: BorderSide(
+            color: Colors.grey.withOpacity(0.3), // Grey with 7.50% opacity
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(7.5),
+          borderSide: BorderSide(
+            color: Colors.grey.withOpacity(0.3), // Grey with 7.50% opacity
+          ),
+        ),
       ),
+      validator: widget.validator,
+      onChanged: (value) {
+        _formKey.currentState?.validate();
+      },
+      maxLines: null,
+      minLines: 1,
     );
   }
 }

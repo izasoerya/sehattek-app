@@ -55,7 +55,7 @@ class AppTheme {
     textTheme: TextTheme(
       bodyMedium:
           TextStyle(color: Colors.white, fontSize: 2.h), // Responsive font size
-      bodySmall: TextStyle(color: Colors.white70, fontSize: 1.8.h),
+      bodySmall: TextStyle(color: Colors.white70, fontSize: 1.9.h),
     ),
     buttonTheme: const ButtonThemeData(
       buttonColor: Colors.blue,
