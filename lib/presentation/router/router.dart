@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:sehattek_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:sehattek_app/presentation/blocs/auth/auth_state.dart';
 import 'package:sehattek_app/presentation/layout/common_layout.dart';
 import 'package:sehattek_app/presentation/pages/auth/desktop/login_page_desktop.dart';
 import 'package:sehattek_app/presentation/pages/auth/desktop/register_page_desktop.dart';
@@ -27,6 +30,13 @@ String determinePlatform(BuildContext context) {
 
 final router = GoRouter(
   initialLocation: '/login',
+  redirect: (context, state) {
+    if (state.fullPath == '/dashboard' &&
+        BlocProvider.of<AuthenticationBloc>(context).state is! UserLoggedIn) {
+      return '/login';
+    }
+    return '/login';
+  },
   routes: [
     GoRoute(
       path: '/login',

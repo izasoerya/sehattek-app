@@ -31,7 +31,7 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
       listener: (context, snapshot) {
         if (snapshot is UserLoggedIn) {
           router.go('/dashboard');
-          print('User logged in');
+          print(snapshot.user!.email);
         }
       },
       child: Column(
