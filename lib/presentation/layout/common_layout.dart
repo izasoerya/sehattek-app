@@ -8,11 +8,6 @@ class CommonLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: GoRouterState.of(context).uri.toString() == '/dashboard'
-          ? AppBar(
-              title: Text('Dashboard'),
-            )
-          : null,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(

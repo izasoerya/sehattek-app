@@ -29,15 +29,15 @@ String determinePlatform(BuildContext context) {
 }
 
 final router = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/dashboard',
   redirect: (context, state) {
-    if (state.fullPath == '/dashboard' &&
-        BlocProvider.of<AuthenticationBloc>(context).state is! UserLoggedIn) {
-      return '/login';
-    } else if (state.fullPath == '/login' &&
-        BlocProvider.of<AuthenticationBloc>(context).state is UserLoggedIn) {
-      return '/dashboard';
-    }
+    // if (state.fullPath == '/dashboard' &&
+    //     BlocProvider.of<AuthenticationBloc>(context).state is! UserLoggedIn) {
+    //   return '/login';
+    // } else if (state.fullPath == '/login' &&
+    //     BlocProvider.of<AuthenticationBloc>(context).state is UserLoggedIn) {
+    //   return '/dashboard';
+    // }
   },
   routes: [
     GoRoute(
