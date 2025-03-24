@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sehattek_app/core/utils/textfield_validator.dart';
 import 'package:sehattek_app/core/widgets/atom/button_general.dart';
 import 'package:sehattek_app/core/widgets/atom/button_oauth.dart';
+import 'package:sehattek_app/core/widgets/atom/hero_card.dart';
 import 'package:sehattek_app/core/widgets/atom/text_button_general.dart';
 import 'package:sehattek_app/core/widgets/atom/text_input.dart';
 import 'package:sehattek_app/core/widgets/atom/toggle_button_general.dart';
@@ -37,27 +38,7 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
         children: [
           Flexible(
             child: Center(
-              child: Container(
-                width: 350,
-                height: 430,
-                padding: const EdgeInsets.only(
-                  left: 30,
-                  right: 30,
-                  top: 20,
-                  bottom: 15,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
+              child: HeroCard(
                 child: Form(
                   key: _formKey, // Form key to handle validation
                   child: Column(
@@ -97,19 +78,19 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButtonGeneral(
-                              text: 'Forgot Password?', onPressed: () {}),
+                            text: 'Forgot Password?',
+                            onPressed: () => router.go('/forgot-password'),
+                          ),
                         ],
                       ),
                       ButtonGeneral(
                         label: const Text('Login'),
                         onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            // Only dispatch event if form is valid
+                          if (_formKey.currentState!.validate() &&
+                              _email.text.isNotEmpty &&
+                              _password.text.isNotEmpty) {
                             context.read<AuthenticationBloc>().add(
-                                  LoginEvent(
-                                    _email.text,
-                                    _password.text,
-                                  ),
+                                  LoginEvent(_email.text, _password.text),
                                 );
                           }
                         },

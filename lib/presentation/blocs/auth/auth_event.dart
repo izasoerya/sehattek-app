@@ -8,3 +8,12 @@ class LoginEvent extends AuthenticationEvent {
 }
 
 class LogoutEvent extends AuthenticationEvent {}
+
+class RegisterEvent extends AuthenticationEvent {
+  final String name;
+  final String phone;
+  final String email;
+  final String password;
+
+  RegisterEvent(this.name, this.phone, this.email, this.password);
+}

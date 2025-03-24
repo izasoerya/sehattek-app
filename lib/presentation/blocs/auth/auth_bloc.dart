@@ -32,5 +32,34 @@ class AuthenticationBloc
         emit(AuthenticationFailure('An unexpected error occurred'));
       }
     });
+    on<RegisterEvent>((event, emit) async {
+      emit(AuthenticationLoading());
+      try {
+        final response = await Supabase.instance.client.auth.signUp(
+          email: event.email,
+          password: event.password,
+          data: {
+            'username': event.name,
+            'phone': event.phone,
+          },
+        );
+
+        if (response.user != null && response.session == null) {
+          print('Register success');
+          EntitiesProvider user = EntitiesProvider(
+            uid: response.user!.id,
+            name: event.name,
+            phoneNumber: event.phone,
+            email: event.email,
+            password: event.password,
+            createdAt: DateTime.parse(response.user!.createdAt),
+          );
+          emit(UserLoggedIn(user));
+        }
+      } catch (e) {
+        print('Register error: $e');
+        emit(AuthenticationFailure('An unexpected error occurred'));
+      }
+    });
   }
 }

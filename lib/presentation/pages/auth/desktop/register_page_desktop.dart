@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sehattek_app/core/utils/textfield_validator.dart';
 import 'package:sehattek_app/core/widgets/atom/button_general.dart';
+import 'package:sehattek_app/core/widgets/atom/hero_card.dart';
+import 'package:sehattek_app/core/widgets/atom/text_button_general.dart';
 import 'package:sehattek_app/core/widgets/atom/text_input.dart';
 import 'package:sehattek_app/core/widgets/atom/toggle_button_general.dart';
 import 'package:sehattek_app/core/widgets/molecule/footer.dart';
+import 'package:sehattek_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:sehattek_app/presentation/blocs/auth/auth_event.dart';
 import 'package:sehattek_app/presentation/router/router.dart';
 
 class RegisterPageDesktop extends StatefulWidget {
@@ -17,6 +23,7 @@ class _RegisterPageDesktopState extends State<RegisterPageDesktop> {
   final _phone = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -24,73 +31,86 @@ class _RegisterPageDesktopState extends State<RegisterPageDesktop> {
       children: [
         Flexible(
           child: Center(
-            child: Container(
-              width: 350,
-              height: 420,
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withValues(alpha: 0.2),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        'Create an Account',
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      Text(
-                        'Sign up to get started',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  const ToggleButtonGeneral(),
-                  const Spacer(),
-                  TextInput(
-                    controller: _name,
-                    label: 'Nama',
-                    hintText: 'Nama',
-                    type: TextInputType.name,
-                  ),
-                  const SizedBox(height: 10),
-                  TextInput(
-                    controller: _phone,
-                    label: 'No. Telepon',
-                    hintText: 'No. Telepon',
-                    type: TextInputType.number,
-                  ),
-                  const SizedBox(height: 10),
-                  TextInput(
-                    controller: _email,
-                    label: 'Email',
-                    hintText: 'Email',
-                    type: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 10),
-                  TextInput(
-                    controller: _password,
-                    label: 'Password',
-                    hintText: 'Password',
-                    type: TextInputType.visiblePassword,
-                  ),
-                  const Spacer(),
-                  ButtonGeneral(
-                    label: const Text('Sign Up'),
-                    onPressed: () => router.go('/login'),
-                  ),
-                ],
+            child: HeroCard(
+              height: 450,
+              child: Form(
+                key: _formKey, // Form key to handle validation
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          'Create an Account',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        Text(
+                          'Sign up to get started',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    const ToggleButtonGeneral(),
+                    const Spacer(),
+                    TextInput(
+                      controller: _name,
+                      label: 'Nama',
+                      hintText: 'Nama',
+                      type: TextInputType.name,
+                      validator: TextfieldValidator.validateName,
+                    ),
+                    const SizedBox(height: 10),
+                    TextInput(
+                      controller: _phone,
+                      label: 'No. Telepon',
+                      hintText: 'No. Telepon',
+                      type: TextInputType.number,
+                      validator: TextfieldValidator.validatePhoneNumber,
+                    ),
+                    const SizedBox(height: 10),
+                    TextInput(
+                      controller: _email,
+                      label: 'Email',
+                      hintText: 'Email',
+                      type: TextInputType.emailAddress,
+                      validator: TextfieldValidator.validateEmail,
+                    ),
+                    const SizedBox(height: 10),
+                    TextInput(
+                      controller: _password,
+                      label: 'Password',
+                      hintText: 'Password',
+                      type: TextInputType.visiblePassword,
+                      validator: TextfieldValidator.validatePassword,
+                    ),
+                    const Spacer(),
+                    ButtonGeneral(
+                      label: const Text('Sign Up'),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate() &&
+                            _name.text.isNotEmpty &&
+                            _phone.text.isNotEmpty &&
+                            _email.text.isNotEmpty &&
+                            _password.text.isNotEmpty) {
+                          context.read<AuthenticationBloc>().add(
+                                (RegisterEvent(
+                                  _name.text,
+                                  _phone.text,
+                                  _email.text,
+                                  _password.text,
+                                )),
+                              );
+                          router.go('/login');
+                        }
+                      },
+                    ),
+                    TextButtonGeneral(
+                      text: 'Sudah Punya Akun?',
+                      onPressed: () => router.go('/login'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
