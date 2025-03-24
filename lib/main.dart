@@ -1,3 +1,5 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sehattek_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:sehattek_app/presentation/layout/theme.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
@@ -21,18 +23,21 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Sizer(
-      builder: (context, orientation, deviceType) => MaterialApp.router(
-        theme: AppTheme.lightTheme,
-        routerConfig: router,
-        builder: (context, child) => ResponsiveBreakpoints.builder(
-          breakpoints: [
-            const Breakpoint(start: 0, end: 1279, name: MOBILE),
-            const Breakpoint(start: 451, end: 800, name: TABLET),
-            const Breakpoint(start: 1280, end: 1920, name: DESKTOP),
-            const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
-          ],
-          child: child!,
+    return BlocProvider(
+      create: (context) => AuthenticationBloc(),
+      child: Sizer(
+        builder: (context, orientation, deviceType) => MaterialApp.router(
+          theme: AppTheme.lightTheme,
+          routerConfig: router,
+          builder: (context, child) => ResponsiveBreakpoints.builder(
+            breakpoints: [
+              const Breakpoint(start: 0, end: 1279, name: MOBILE),
+              const Breakpoint(start: 451, end: 800, name: TABLET),
+              const Breakpoint(start: 1280, end: 1920, name: DESKTOP),
+              const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+            ],
+            child: child!,
+          ),
         ),
       ),
     );
