@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sehattek_app/core/utils/textfield_validator.dart';
 import 'package:sehattek_app/core/widgets/atom/button_general.dart';
 import 'package:sehattek_app/core/widgets/atom/button_oauth.dart';
 import 'package:sehattek_app/core/widgets/atom/text_button_general.dart';
@@ -9,6 +10,7 @@ import 'package:sehattek_app/core/widgets/molecule/footer.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_event.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_state.dart';
+import 'package:sehattek_app/presentation/router/router.dart';
 
 class LoginPageDesktop extends StatefulWidget {
   const LoginPageDesktop({super.key});
@@ -38,9 +40,11 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
               child: Container(
                 width: 350,
                 height: 430,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 30,
+                padding: const EdgeInsets.only(
+                  left: 30,
+                  right: 30,
+                  top: 20,
+                  bottom: 15,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -79,12 +83,7 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
                         label: 'Email',
                         hintText: 'Email',
                         type: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          return null;
-                        },
+                        validator: TextfieldValidator.validateEmail,
                       ),
                       const SizedBox(height: 10),
                       TextInput(
@@ -92,12 +91,7 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
                         label: 'Password',
                         hintText: 'Password',
                         type: TextInputType.visiblePassword,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          return null;
-                        },
+                        validator: TextfieldValidator.validatePassword,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -106,7 +100,6 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
                               text: 'Forgot Password?', onPressed: () {}),
                         ],
                       ),
-                      const Spacer(),
                       ButtonGeneral(
                         label: const Text('Login'),
                         onPressed: () {
@@ -130,6 +123,11 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
                           print("OAuth login triggered");
                         },
                       ),
+                      SizedBox(height: 10),
+                      TextButtonGeneral(
+                        text: 'Belum Punya Akun?',
+                        onPressed: () => router.go('/register'),
+                      )
                     ],
                   ),
                 ),

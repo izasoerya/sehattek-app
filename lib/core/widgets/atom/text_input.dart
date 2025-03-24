@@ -38,11 +38,8 @@ class _TextInputState extends State<TextInput> {
           .copyWith(fontWeight: FontWeight.w600),
       decoration: InputDecoration(
         focusColor: Colors.red,
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: 1.sw,
-          vertical: 0.5.sh,
-        ),
-        constraints: BoxConstraints(minHeight: 40, maxHeight: 60),
+        contentPadding: EdgeInsets.symmetric(horizontal: 1.sw),
+        constraints: BoxConstraints(maxHeight: 55),
         errorStyle: Theme.of(context).textTheme.bodySmall!.copyWith(
               color: Colors.red,
               fontSize: 1.5.h,
