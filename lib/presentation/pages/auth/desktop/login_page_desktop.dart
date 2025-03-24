@@ -30,6 +30,7 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, snapshot) {
         if (snapshot is UserLoggedIn) {
+          router.go('/dashboard');
           print('User logged in');
         }
       },

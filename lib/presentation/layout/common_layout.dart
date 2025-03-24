@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_bloc.dart';
 
 class CommonLayout extends StatelessWidget {
@@ -9,6 +10,11 @@ class CommonLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: GoRouterState.of(context).uri.toString() == '/dashboard'
+          ? AppBar(
+              title: Text('Dashboard'),
+            )
+          : null,
       body: BlocProvider(
         create: (context) => AuthenticationBloc(),
         child: Container(

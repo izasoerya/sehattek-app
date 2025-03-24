@@ -6,6 +6,7 @@ import 'package:sehattek_app/presentation/pages/auth/desktop/login_page_desktop.
 import 'package:sehattek_app/presentation/pages/auth/desktop/register_page_desktop.dart';
 import 'package:sehattek_app/presentation/pages/auth/mobile/login_page_mobile.dart';
 import 'package:sehattek_app/presentation/pages/auth/mobile/register_page_mobile.dart';
+import 'package:sehattek_app/presentation/pages/dashboard/desktop/dashboard_page_desktop.dart';
 
 String determinePlatform(BuildContext context) {
   double width = MediaQuery.of(context).size.width;
@@ -55,5 +56,18 @@ final router = GoRouter(
         }
       },
     ),
+    GoRoute(
+        path: '/dashboard',
+        builder: (context, state) {
+          String platform = determinePlatform(context);
+
+          if (platform == 'mobile') {
+            return CommonLayout(child: DashboardPageDesktop());
+          } else if (platform == 'desktop') {
+            return CommonLayout(child: DashboardPageDesktop());
+          } else {
+            return CommonLayout(child: DashboardPageDesktop()); // 4k platform
+          }
+        }),
   ],
 );
