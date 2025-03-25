@@ -26,3 +26,6 @@ flutter:
 
 assets:
   - assets/.env
+  - assets/icon/checkout.png
+  - assets/icon/done.png
+  - assets/icon/history.png
