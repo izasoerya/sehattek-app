@@ -23,6 +23,15 @@ class AppTheme {
         fontWeight: FontWeight.w600,
       ),
       bodySmall: TextStyle(color: Colors.black54, fontSize: 1.8.h),
+      headlineLarge: TextStyle(
+        color: Colors.black,
+        fontSize: 20.sp,
+        fontWeight: FontWeight.bold,
+      ),
+      headlineSmall: TextStyle(
+        color: Colors.black,
+        fontSize: 14.sp,
+      ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
@@ -60,6 +69,15 @@ class AppTheme {
       ),
       bodyMedium: TextStyle(color: Colors.white, fontSize: 12.sp),
       bodySmall: TextStyle(color: Colors.white70, fontSize: 10.sp),
+      headlineLarge: TextStyle(
+        color: Colors.white,
+        fontSize: 24.sp,
+        fontWeight: FontWeight.bold,
+      ),
+      headlineSmall: TextStyle(
+        color: Colors.white,
+        fontSize: 12.sp,
+      ),
     ),
     buttonTheme: const ButtonThemeData(
       buttonColor: Colors.blue,
