@@ -33,8 +33,8 @@ class _CardContainerState extends State<CardContainer> {
         });
       },
       child: Container(
-        width: 175,
-        height: 175,
+        width: 250,
+        height: 190,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,

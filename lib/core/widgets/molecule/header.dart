@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sehattek_app/presentation/router/router.dart';
 import 'package:sizer/sizer.dart';
 
 class Header extends StatelessWidget {
@@ -31,7 +32,7 @@ class Header extends StatelessWidget {
           Row(
             children: [
               TextButton(
-                onPressed: () {},
+                onPressed: () => router.go('/dashboard'),
                 child: Text(
                   'Dashboard',
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
@@ -40,7 +41,7 @@ class Header extends StatelessWidget {
                 ),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () => router.go('/order'),
                 child: Text(
                   'Order',
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
@@ -49,7 +50,7 @@ class Header extends StatelessWidget {
                 ),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () => router.go('/report'),
                 child: Text(
                   'Reports',
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
