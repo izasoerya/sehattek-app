@@ -20,16 +20,37 @@ class EntitiesServiceProduct {
   });
 
   factory EntitiesServiceProduct.fromJSON(Map<String, dynamic> map) {
-    return EntitiesServiceProduct(
-      uid: map['uid'],
-      uidProvider: map['uid_provider'],
-      name: map['name'],
-      description: map['description'],
-      price: map['price'],
-      orderDate: DateTime.parse(map['order_date']),
-      updateAt: DateTime.parse(map['update_at']),
-      createdAt: DateTime.parse(map['created_at']),
-    );
+    try {
+      print('Parsing uid: ${map['uid']}');
+      print('Parsing uidProvider: ${map['uid_provider']}');
+      print('Parsing name: ${map['name']}');
+      print('Parsing description: ${map['description']}');
+      print('Parsing price: ${map['price']}');
+      print('Parsing orderDate: ${map['order_datetime']}');
+      print('Parsing updateAt: ${map['update_at']}');
+      print('Parsing createdAt: ${map['created_at']}');
+
+      return EntitiesServiceProduct(
+        uid: map['uid']?.toString() ?? 'Unknown UID',
+        uidProvider: map['uid_provider']?.toString() ?? 'Unknown Provider',
+        name: map['name'] ?? 'Unknown Name',
+        description: map['description'] ?? 'No Description',
+        price: map['price']?.toString() ??
+            '0', // Convert to string and handle null
+        orderDate: map['order_datetime'] != null
+            ? DateTime.parse(map['order_datetime'])
+            : DateTime.now(), // Default to current date if null
+        updateAt: map['update_at'] != null
+            ? DateTime.parse(map['update_at'])
+            : DateTime.now(), // Default to current date if null
+        createdAt: map['created_at'] != null
+            ? DateTime.parse(map['created_at'])
+            : DateTime.now(), // Default to current date if null
+      );
+    } catch (e) {
+      print('Error parsing JSON: $map, Error: $e');
+      rethrow; // Re-throw the error to handle it in the calling code
+    }
   }
 
   Map<String, dynamic> toMap() {
@@ -39,7 +60,7 @@ class EntitiesServiceProduct {
       'name': name,
       'description': description,
       'price': price,
-      'order_date': orderDate.toIso8601String(),
+      'order_datetime': orderDate.toIso8601String(),
       'update_at': updateAt.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
     };

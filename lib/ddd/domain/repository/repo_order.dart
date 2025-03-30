@@ -1,9 +1,10 @@
+import 'package:sehattek_app/core/utils/error_class.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
 
 abstract class RepoOrder {
-  Future<EntitiesServiceProduct> createOrder(EntitiesServiceProduct order);
-  Future<EntitiesServiceProduct> readOrder(String orderId);
-  Future<List<EntitiesServiceProduct>> readListOrder(String providerId);
-  Future<EntitiesServiceProduct> updateOrder(EntitiesServiceProduct order);
+  Future<ErrorWrapper> createOrder(EntitiesServiceProduct order);
+  Future<ErrorWrapper> readOrder(String orderId);
+  Future<List<ErrorWrapper>> readListOrder(String providerId);
+  Future<ErrorWrapper> updateOrder(EntitiesServiceProduct order);
   Future<void> deleteOrder(EntitiesServiceProduct order);
 }
