@@ -15,9 +15,7 @@ class ServiceOrder {
       readListOrder(String providerId) async {
     final res = await InfrastructureRunner().readListRunner(providerId);
     final listRunner = res.map((e) => e).toList();
-    print('listRunner length: ${listRunner.length}');
 
-    // Use Future.wait to process all runners concurrently
     final futures = listRunner.map((runner) async {
       try {
         final resOrder =
@@ -25,16 +23,14 @@ class ServiceOrder {
         final resStatus =
             await InfrastructureStatus().readStatus(runner.uidStatusProduct);
 
-        if (resOrder.data != null && resStatus != null) {
+        if (resOrder.data != null) {
           return {resOrder.data!: resStatus};
         } else {
-          print(
-              'Skipping due to null data: resOrder=${resOrder.data}, resStatus=$resStatus');
-          return null; // Skip invalid entries
+          return null;
         }
       } catch (error) {
         print('Error processing runner: $runner, Error: $error');
-        return null; // Skip on error
+        return null;
       }
     });
 
