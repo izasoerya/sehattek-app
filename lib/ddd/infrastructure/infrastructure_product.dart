@@ -1,23 +1,23 @@
 import 'package:sehattek_app/core/utils/enumeration.dart';
 import 'package:sehattek_app/core/utils/error_class.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
-import 'package:sehattek_app/ddd/domain/repository/repo_order.dart';
+import 'package:sehattek_app/ddd/domain/repository/repo_product.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class InfrastructureOrder implements RepoOrder {
+class InfrastructureProduct implements RepoProduct {
   @override
-  Future<ErrorWrapper> createOrder(EntitiesServiceProduct order) {
-    // TODO: implement createOrder
+  Future<ErrorWrapper> createProduct(EntitiesServiceProduct product) {
+    // TODO: implement createProduct
     throw UnimplementedError();
   }
 
   @override
-  Future<ErrorWrapper> readOrder(String orderId) async {
+  Future<ErrorWrapper> readProduct(String productId) async {
     try {
       final res = await Supabase.instance.client
           .from('service_product')
           .select()
-          .eq('uid', orderId)
+          .eq('uid', productId)
           .single();
       return ErrorWrapper(
           message: '', type: null, data: EntitiesServiceProduct.fromJSON(res));
@@ -28,7 +28,7 @@ class InfrastructureOrder implements RepoOrder {
   }
 
   @override
-  Future<List<ErrorWrapper>> readListOrder(String providerId) async {
+  Future<List<ErrorWrapper>> readListProduct(String providerId) async {
     try {
       final response = await Supabase.instance.client
           .from('service_product')
@@ -56,14 +56,14 @@ class InfrastructureOrder implements RepoOrder {
   }
 
   @override
-  Future<ErrorWrapper> updateOrder(EntitiesServiceProduct order) {
-    // TODO: implement updateOrder
+  Future<ErrorWrapper> updateProduct(EntitiesServiceProduct product) {
+    // TODO: implement updateProduct
     throw UnimplementedError();
   }
 
   @override
-  Future<void> deleteOrder(EntitiesServiceProduct order) {
-    // TODO: implement deleteOrder
+  Future<void> deleteProduct(EntitiesServiceProduct product) {
+    // TODO: implement deleteProduct
     throw UnimplementedError();
   }
 }
