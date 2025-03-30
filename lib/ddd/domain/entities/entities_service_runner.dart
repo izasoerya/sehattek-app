@@ -21,8 +21,8 @@ class EntitiesServiceRunner {
       uidProvider: map["uid_provider"],
       uidStatusProduct: map["uid_status_product"],
       uidServiceProduct: map["uid_service_product"],
-      updatedAt: map["updated_at"],
-      createdAt: map["created_at"],
+      updatedAt: DateTime.parse(map["updated_at"]),
+      createdAt: DateTime.parse(map["created_at"]),
     );
   }
 
