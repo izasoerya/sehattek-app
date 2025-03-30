@@ -10,6 +10,9 @@ import 'package:sehattek_app/presentation/pages/auth/desktop/register_page_deskt
 import 'package:sehattek_app/presentation/pages/auth/mobile/login_page_mobile.dart';
 import 'package:sehattek_app/presentation/pages/auth/mobile/register_page_mobile.dart';
 import 'package:sehattek_app/presentation/pages/dashboard/desktop/dashboard_page_desktop.dart';
+import 'package:sehattek_app/presentation/pages/dashboard/mobile/dashboard_page_mobile.dart';
+import 'package:sehattek_app/presentation/pages/order/desktop/order_page_desktop.dart';
+import 'package:sehattek_app/presentation/pages/order/mobile/order_page_mobile.dart';
 
 String determinePlatform(BuildContext context) {
   double width = MediaQuery.of(context).size.width;
@@ -29,15 +32,18 @@ String determinePlatform(BuildContext context) {
 }
 
 final router = GoRouter(
-  initialLocation: '/dashboard',
+  initialLocation: '/login',
   redirect: (context, state) {
-    // if (state.fullPath == '/dashboard' &&
-    //     BlocProvider.of<AuthenticationBloc>(context).state is! UserLoggedIn) {
-    //   return '/login';
-    // } else if (state.fullPath == '/login' &&
-    //     BlocProvider.of<AuthenticationBloc>(context).state is UserLoggedIn) {
-    //   return '/dashboard';
-    // }
+    if (state.fullPath == '/login' &&
+        BlocProvider.of<AuthenticationBloc>(context).state is UserLoggedIn) {
+      return '/dashboard';
+    } else if (state.fullPath == '/dashboard' &&
+        BlocProvider.of<AuthenticationBloc>(context).state is! UserLoggedIn) {
+      return '/login';
+    } else if (state.fullPath == '/order' &&
+        BlocProvider.of<AuthenticationBloc>(context).state is! UserLoggedIn) {
+      return '/login';
+    }
   },
   routes: [
     GoRoute(
@@ -74,7 +80,33 @@ final router = GoRouter(
           String platform = determinePlatform(context);
 
           if (platform == 'mobile') {
+            return CommonLayout(child: DashboardPageMobile());
+          } else if (platform == 'desktop') {
             return CommonLayout(child: DashboardPageDesktop());
+          } else {
+            return CommonLayout(child: DashboardPageDesktop()); // 4k platform
+          }
+        }),
+    GoRoute(
+        path: '/order',
+        builder: (context, state) {
+          String platform = determinePlatform(context);
+
+          if (platform == 'mobile') {
+            return CommonLayout(child: OrderPageMobile());
+          } else if (platform == 'desktop') {
+            return CommonLayout(child: OrderPageDesktop());
+          } else {
+            return CommonLayout(child: OrderPageDesktop()); // 4k platform
+          }
+        }),
+    GoRoute(
+        path: '/report',
+        builder: (context, state) {
+          String platform = determinePlatform(context);
+
+          if (platform == 'mobile') {
+            return CommonLayout(child: DashboardPageMobile());
           } else if (platform == 'desktop') {
             return CommonLayout(child: DashboardPageDesktop());
           } else {

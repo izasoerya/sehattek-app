@@ -26,7 +26,7 @@ class EntitiesProvider {
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJSON() {
     return {
       'uid': uid,
       'name': name,
