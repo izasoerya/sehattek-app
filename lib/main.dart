@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:sehattek_app/presentation/blocs/order/order_bloc.dart';
 import 'package:sehattek_app/presentation/layout/theme.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
@@ -23,8 +24,15 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthenticationBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthenticationBloc>(
+          create: (context) => AuthenticationBloc(),
+        ),
+        BlocProvider<OrderBloc>(
+          create: (context) => OrderBloc(),
+        ),
+      ],
       child: Sizer(
         builder: (context, orientation, deviceType) => MaterialApp.router(
           theme: AppTheme.lightTheme,
