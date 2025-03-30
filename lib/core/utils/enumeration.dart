@@ -9,3 +9,10 @@ enum StatusType {
   complete,
   cancel,
 }
+
+enum ErrorType {
+  network,
+  server,
+  validation,
+  unknown,
+}
