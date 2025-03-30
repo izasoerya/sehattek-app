@@ -30,38 +30,20 @@ class InfrastructureOrder implements RepoOrder {
   @override
   Future<List<ErrorWrapper>> readListOrder(String providerId) async {
     try {
-      // Step 1: Execute the query
       final response = await Supabase.instance.client
           .from('service_product')
           .select()
           .eq('uid_provider', providerId);
-      print('Raw response: ${response}');
-
-      // Step 2: Map the data to `ErrorWrapper` objects
-      final dataList = (response as List).map((e) {
-        try {
-          print('Mapping item: $e'); // Print each item before mapping
-          return ErrorWrapper(
-            message: '',
-            type: null,
-            data: EntitiesServiceProduct.fromJSON(
-                e), // Ensure this method works correctly
-          );
-        } catch (error) {
-          print('Error mapping item: $e, Error: $error');
-          return ErrorWrapper(
-            message: 'Error mapping item',
-            type: ErrorType.unknown,
-            data: null,
-          );
-        }
-      }).toList();
-
-      // Step 3: Print the final mapped list
-      print('Mapped data list: $dataList');
-      return dataList;
+      return response
+          .map(
+            (e) => ErrorWrapper(
+              message: '',
+              type: null,
+              data: EntitiesServiceProduct.fromJSON(e),
+            ),
+          )
+          .toList();
     } on Exception catch (e) {
-      // Step 4: Handle exceptions
       print('Exception occurred: $e');
       return [
         ErrorWrapper(

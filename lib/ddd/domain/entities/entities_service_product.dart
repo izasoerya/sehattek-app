@@ -21,22 +21,12 @@ class EntitiesServiceProduct {
 
   factory EntitiesServiceProduct.fromJSON(Map<String, dynamic> map) {
     try {
-      print('Parsing uid: ${map['uid']}');
-      print('Parsing uidProvider: ${map['uid_provider']}');
-      print('Parsing name: ${map['name']}');
-      print('Parsing description: ${map['description']}');
-      print('Parsing price: ${map['price']}');
-      print('Parsing orderDate: ${map['order_datetime']}');
-      print('Parsing updateAt: ${map['update_at']}');
-      print('Parsing createdAt: ${map['created_at']}');
-
       return EntitiesServiceProduct(
         uid: map['uid']?.toString() ?? 'Unknown UID',
         uidProvider: map['uid_provider']?.toString() ?? 'Unknown Provider',
         name: map['name'] ?? 'Unknown Name',
         description: map['description'] ?? 'No Description',
-        price: map['price']?.toString() ??
-            '0', // Convert to string and handle null
+        price: map['price']?.toString() ?? '0',
         orderDate: map['order_datetime'] != null
             ? DateTime.parse(map['order_datetime'])
             : DateTime.now(), // Default to current date if null
