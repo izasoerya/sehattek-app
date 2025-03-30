@@ -1,65 +1,91 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_provider.dart';
+import 'package:sehattek_app/ddd/service/service_auth.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_event.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_state.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
+  final SupabaseClient _supabaseClient = Supabase.instance.client;
+
   AuthenticationBloc() : super(AuthenticationInitial()) {
-    on<LoginEvent>((event, emit) async {
-      emit(AuthenticationLoading());
-      try {
-        final response = await Supabase.instance.client.auth.signInWithPassword(
-          email: event.email,
-          password: event.password,
-        );
+    final currentSession = _supabaseClient.auth.currentSession;
+    if (currentSession != null) {
+      final user = EntitiesProvider(
+        uid: currentSession.user.id,
+        name: currentSession.user.userMetadata?['username'] ?? 'Unknown User',
+        phoneNumber: currentSession.user.phone ?? '',
+        email: currentSession.user.email ?? '',
+        password: currentSession.accessToken,
+        createdAt: DateTime.parse(currentSession.user.createdAt),
+      );
+      emit(UserLoggedIn(user));
+    } else {
+      emit(AuthenticationUnauthenticated());
+    }
 
-        if (response.session != null && response.user != null) {
-          print('Login success');
-          EntitiesProvider user = EntitiesProvider(
-            uid: response.user!.id,
-            name: response.user!.userMetadata?['username'] ?? 'Unknown User',
-            phoneNumber: response.user!.phone ?? '',
-            email: response.user!.email ?? '',
-            password: response.session!.accessToken,
-            createdAt: DateTime.parse(response.user!.createdAt),
-          );
-          emit(UserLoggedIn(user));
-        }
-      } catch (e) {
-        print('Login error: $e');
-        emit(AuthenticationFailure('An unexpected error occurred'));
+    _supabaseClient.auth.onAuthStateChange.listen((data) {
+      final event = data.event;
+      final session = data.session;
+
+      if (event == AuthChangeEvent.signedIn && session != null) {
+        final user = EntitiesProvider(
+          uid: session.user.id,
+          name: session.user.userMetadata?['username'] ?? 'Unknown User',
+          phoneNumber: session.user.phone ?? '',
+          email: session.user.email ?? '',
+          password: session.accessToken,
+          createdAt: DateTime.parse(session.user.createdAt),
+        );
+        add(UserLoggedInEvent(user)); // Dispatch event, not state!
+      } else if (event == AuthChangeEvent.signedOut) {
+        add(UserLoggedOutEvent());
       }
     });
-    on<RegisterEvent>((event, emit) async {
-      emit(AuthenticationLoading());
-      try {
-        final response = await Supabase.instance.client.auth.signUp(
-          email: event.email,
-          password: event.password,
-          data: {
-            'username': event.name,
-            'phone': event.phone,
-          },
-        );
 
-        if (response.user != null && response.session == null) {
-          print('Register success');
-          EntitiesProvider user = EntitiesProvider(
-            uid: response.user!.id,
-            name: event.name,
-            phoneNumber: event.phone,
-            email: event.email,
-            password: event.password,
-            createdAt: DateTime.parse(response.user!.createdAt),
-          );
-          emit(UserLoggedIn(user));
-        }
-      } catch (e) {
-        print('Register error: $e');
-        emit(AuthenticationFailure('An unexpected error occurred'));
+    on<LoginEvent>(_onLogin);
+    on<RegisterEvent>(_onRegister);
+    on<UserLoggedInEvent>(
+      (event, emit) => emit(UserLoggedIn(event.user)),
+    );
+    on<UserLoggedOutEvent>(
+      (event, emit) => emit(AuthenticationUnauthenticated()),
+    );
+  }
+
+  Future<void> _onLogin(
+      LoginEvent event, Emitter<AuthenticationState> emit) async {
+    emit(AuthenticationLoading());
+    try {
+      final response = await _supabaseClient.auth.signInWithPassword(
+        email: event.email,
+        password: event.password,
+      );
+
+      if (response.session == null || response.user == null) {
+        emit(AuthenticationFailure('Invalid credentials'));
       }
-    });
+    } catch (e) {
+      print('Login error: $e');
+      emit(AuthenticationFailure('An unexpected error occurred'));
+    }
+  }
+
+  Future<void> _onRegister(
+      RegisterEvent event, Emitter<AuthenticationState> emit) async {
+    emit(AuthenticationLoading());
+    try {
+      final res = await ServiceAuth().providerSignUp(
+        event.email,
+        event.password,
+        event.name,
+        event.phone,
+      );
+      emit(UserLoggedIn(res));
+    } catch (e) {
+      print('Register error: $e');
+      emit(AuthenticationFailure(e.toString()));
+    }
   }
 }
