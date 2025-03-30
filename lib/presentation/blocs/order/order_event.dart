@@ -12,9 +12,8 @@ class OrderEventFetchList extends OrderEvent {
   OrderEventFetchList(this.providerId);
 }
 
-class OrderEventFetchListByStatus extends OrderEvent {
+class OrderEventFetchListWithStatus extends OrderEvent {
   final String providerId;
-  final String status;
 
-  OrderEventFetchListByStatus(this.providerId, this.status);
+  OrderEventFetchListWithStatus(this.providerId);
 }
