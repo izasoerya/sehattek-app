@@ -1,31 +1,47 @@
 import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
-import 'package:sehattek_app/ddd/infrastructure/infrastructure_order.dart';
+import 'package:sehattek_app/ddd/domain/entities/entities_status_product.dart';
+import 'package:sehattek_app/ddd/infrastructure/infrastructure_product.dart';
+import 'package:sehattek_app/ddd/infrastructure/infrastructure_runner.dart';
+import 'package:sehattek_app/ddd/infrastructure/infrastructure_status.dart';
 
 class ServiceOrder {
-  ServiceOrder();
-
-  void createOrder() {
-    // Create order
+  Future<List<EntitiesServiceProduct>> readListProduct(
+      String providerId) async {
+    final res = await InfrastructureProduct().readListProduct(providerId);
+    return res.where((e) => e.data != null).map((e) => e.data!).toList();
   }
 
-  void readOrder() {
-    // Read order
-  }
+  Future<List<Map<EntitiesServiceProduct, EntitiesStatusProduct>>>
+      readListOrder(String providerId) async {
+    final res = await InfrastructureRunner().readListRunner(providerId);
+    final listRunner = res.map((e) => e).toList();
+    print('listRunner length: ${listRunner.length}');
 
-  Future<List<EntitiesServiceProduct?>> readListOrder(String providerId) async {
-    final res = await InfrastructureOrder().readListOrder(providerId);
-    if (res[0].type == null) {
-      return res.map((e) => e.data).toList();
-    } else {
-      return [];
-    }
-  }
+    // Use Future.wait to process all runners concurrently
+    final futures = listRunner.map((runner) async {
+      try {
+        final resOrder =
+            await InfrastructureProduct().readProduct(runner.uidServiceProduct);
+        final resStatus =
+            await InfrastructureStatus().readStatus(runner.uidStatusProduct);
 
-  void updateOrder() {
-    // Update order
-  }
+        if (resOrder.data != null && resStatus != null) {
+          return {resOrder.data!: resStatus};
+        } else {
+          print(
+              'Skipping due to null data: resOrder=${resOrder.data}, resStatus=$resStatus');
+          return null; // Skip invalid entries
+        }
+      } catch (error) {
+        print('Error processing runner: $runner, Error: $error');
+        return null; // Skip on error
+      }
+    });
 
-  void deleteOrder() {
-    // Delete order
+    final results = await Future.wait(futures);
+    return results
+        .where((element) => element != null)
+        .cast<Map<EntitiesServiceProduct, EntitiesStatusProduct>>()
+        .toList();
   }
 }
