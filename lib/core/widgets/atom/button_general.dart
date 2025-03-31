@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ButtonGeneral extends StatelessWidget {
   final Text label;
-  final IconData? icon;
+  final Icon? icon;
   final void Function()? onPressed;
 
   const ButtonGeneral({
@@ -24,7 +24,7 @@ class ButtonGeneral extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (icon != null) Icon(icon),
+            if (icon != null) icon!,
             SizedBox(width: icon != null ? 10 : 0),
             label,
           ],

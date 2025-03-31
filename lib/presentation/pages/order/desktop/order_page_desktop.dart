@@ -44,25 +44,21 @@ class _OrderPageDesktopState extends State<OrderPageDesktop> {
           setState(() => listOrder = state.listOrder);
         }
       },
-      child: SizedBox(
-        height: 100.h,
-        width: 100.w,
-        child: SingleChildScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Header(),
-              SizedBox(height: 10.sh),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 5.w),
-                constraints: BoxConstraints(minHeight: 60.h),
-                child: TableOrder(listOrder: listOrder),
-              ),
-              SizedBox(height: 10.sh),
-              Footer(),
-            ],
-          ),
+      child: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Header(),
+            SizedBox(height: 10.sh),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 5.w),
+              constraints: BoxConstraints(minHeight: 60.h),
+              child: TableOrder(listOrder: listOrder),
+            ),
+            SizedBox(height: 10.sh),
+            Footer(),
+          ],
         ),
       ),
     );
