@@ -17,7 +17,7 @@ class _CustomTableCellState extends State<CustomTableCell> {
   Widget build(BuildContext context) {
     return Container(
       height: 40,
-      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 7.5),
       alignment: Alignment.centerLeft,
       decoration: BoxDecoration(),
       child: !widget.label.contains('Status')

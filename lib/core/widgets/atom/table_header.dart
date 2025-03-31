@@ -10,9 +10,6 @@ class TableHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.2),
-      ),
       child: TableCell(
         child: Text(
           title,

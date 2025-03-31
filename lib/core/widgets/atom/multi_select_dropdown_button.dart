@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sehattek_app/core/widgets/atom/table_button.dart';
 
 class MultiSelectDropdownButton extends StatefulWidget {
   final List<String> items;
@@ -91,12 +92,7 @@ class _MultiSelectDropdownButtonState extends State<MultiSelectDropdownButton> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: _showMultiSelectDialog,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(5),
-        ),
+      child: TableButton(
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
