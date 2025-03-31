@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sehattek_app/core/widgets/atom/button_general.dart';
+import 'package:sehattek_app/core/widgets/atom/custom_table_cell.dart';
 import 'package:sehattek_app/core/widgets/atom/table_header.dart';
-import 'package:sehattek_app/core/widgets/atom/table_value.dart';
 import 'package:sehattek_app/core/widgets/atom/multi_select_dropdown_button.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_status_product.dart';
@@ -19,6 +19,7 @@ class TableOrder extends StatefulWidget {
 }
 
 class _TableOrderState extends State<TableOrder> {
+  List<String> get tableHeaders => dropdownValues;
   List<String> dropdownValues = [
     'Name',
     'Description',
@@ -26,8 +27,6 @@ class _TableOrderState extends State<TableOrder> {
     'Date',
     'Status'
   ];
-
-  List<String> get tableHeaders => dropdownValues;
 
   List<List<String>> get tableData {
     return widget.listOrder.map((order) {
@@ -119,7 +118,11 @@ class _TableOrderState extends State<TableOrder> {
                     bottom: BorderSide(color: Colors.grey.withOpacity(0.2)),
                   ),
                 ),
-                children: row.map((value) => TableValue(value: value)).toList(),
+                children: row
+                    .map((value) => CustomTableCell(
+                          label: value,
+                        ))
+                    .toList(),
               ),
             ),
           ],

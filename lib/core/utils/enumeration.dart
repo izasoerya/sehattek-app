@@ -1,5 +1,3 @@
-import 'package:sehattek_app/core/utils/status_detail.dart';
-
 enum UserType {
   admin,
   provider,
@@ -11,36 +9,31 @@ enum StatusType {
   complete,
   cancel;
 
-  StatusDetail get detail {
+  String get status {
     switch (this) {
       case StatusType.pending:
-        return StatusDetail(
-          uid: 'a1000000-0000-0000-0000-000000000001',
-          type: 'pending',
-          detailInfo: 'Service is pending',
-          createdAt: DateTime.now(), // Replace with actual timestamp if needed
-        );
+        return 'Pending';
       case StatusType.inProgress:
-        return StatusDetail(
-          uid: 'a1000000-0000-0000-0000-000000000002',
-          type: 'inProgress',
-          detailInfo: 'Service is currently in progress',
-          createdAt: DateTime.now(),
-        );
+        return 'In Progress';
       case StatusType.complete:
-        return StatusDetail(
-          uid: 'a1000000-0000-0000-0000-000000000003',
-          type: 'complete',
-          detailInfo: 'Service completed successfully',
-          createdAt: DateTime.now(),
-        );
+        return 'Completed';
       case StatusType.cancel:
-        return StatusDetail(
-          uid: 'a1000000-0000-0000-0000-000000000004',
-          type: 'cancel',
-          detailInfo: 'Service was cancelled',
-          createdAt: DateTime.now(),
-        );
+        return 'Canceled';
+    }
+  }
+
+  factory StatusType.fromString(String status) {
+    switch (status) {
+      case 'StatusType.pending':
+        return StatusType.pending;
+      case 'StatusType.inProgress':
+        return StatusType.inProgress;
+      case 'StatusType.completed':
+        return StatusType.complete;
+      case 'StatusType.canceled':
+        return StatusType.cancel;
+      default:
+        throw Exception('Invalid status type: $status');
     }
   }
 }
