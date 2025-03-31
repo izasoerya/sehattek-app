@@ -48,6 +48,17 @@ class _MultiSelectDropdownButtonState extends State<MultiSelectDropdownButton> {
                           } else {
                             _selectedItems.remove(item);
                           }
+
+                          // Custom sort: Name, Description, Price, Date, Status
+                          const order = [
+                            'Name',
+                            'Description',
+                            'Price',
+                            'Date',
+                            'Status'
+                          ];
+                          _selectedItems.sort((a, b) =>
+                              order.indexOf(a).compareTo(order.indexOf(b)));
                         });
                       },
                     );

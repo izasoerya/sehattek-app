@@ -118,11 +118,8 @@ class _TableOrderState extends State<TableOrder> {
                     bottom: BorderSide(color: Colors.grey.withOpacity(0.2)),
                   ),
                 ),
-                children: row
-                    .map((value) => CustomTableCell(
-                          label: value,
-                        ))
-                    .toList(),
+                children:
+                    row.map((value) => CustomTableCell(label: value)).toList(),
               ),
             ),
           ],
