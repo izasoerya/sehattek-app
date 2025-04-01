@@ -3,7 +3,7 @@ import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 import 'package:sehattek_app/core/widgets/atom/button_general.dart';
 import 'package:sehattek_app/core/widgets/atom/custom_table_cell.dart';
-import 'package:sehattek_app/core/widgets/atom/scroll_pages.dart';
+import 'package:sehattek_app/core/widgets/molecule/scroll_pages.dart';
 import 'package:sehattek_app/core/widgets/atom/table_button.dart';
 import 'package:sehattek_app/core/widgets/atom/table_header.dart';
 import 'package:sehattek_app/core/widgets/atom/multi_select_dropdown_button.dart';
