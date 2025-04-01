@@ -21,7 +21,7 @@ class OrderPageDesktop extends StatefulWidget {
 }
 
 class _OrderPageDesktopState extends State<OrderPageDesktop> {
-  List<Map<EntitiesServiceProduct, EntitiesStatusProduct>> listOrder = [];
+  List<Map<EntitiesServiceProduct, EntitiesStatusProduct>?> listOrder = [null];
 
   @override
   void initState() {

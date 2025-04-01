@@ -1,13 +1,17 @@
+import 'dart:math';
+import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 import 'package:sehattek_app/core/widgets/atom/button_general.dart';
 import 'package:sehattek_app/core/widgets/atom/custom_table_cell.dart';
+import 'package:sehattek_app/core/widgets/atom/scroll_pages.dart';
+import 'package:sehattek_app/core/widgets/atom/table_button.dart';
 import 'package:sehattek_app/core/widgets/atom/table_header.dart';
 import 'package:sehattek_app/core/widgets/atom/multi_select_dropdown_button.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_status_product.dart';
 
 class TableOrder extends StatefulWidget {
-  final List<Map<EntitiesServiceProduct, EntitiesStatusProduct>> listOrder;
+  final List<Map<EntitiesServiceProduct, EntitiesStatusProduct>?> listOrder;
 
   const TableOrder({
     super.key,
@@ -28,8 +32,14 @@ class _TableOrderState extends State<TableOrder> {
     'Status'
   ];
 
+  // Pagination state
+  int currentPage = 1;
+  final int itemsPerPage = 6;
+
+  // Full table data extracted from listOrder
   List<List<String>> get tableData {
     return widget.listOrder.map((order) {
+      if (order == null) return ['']; // Null is waiting for data
       final product = order.keys.first;
       final status = order.values.first;
       List<String> row = [];
@@ -52,6 +62,18 @@ class _TableOrderState extends State<TableOrder> {
     }).toList();
   }
 
+  // Data to display for the current page
+  List<List<String>> get visibleData {
+    int start = max(0, (currentPage - 1) * itemsPerPage);
+    int end = min(start + itemsPerPage, tableData.length);
+    if (start < tableData.length) {
+      return tableData.sublist(start, end);
+    } else {
+      return [];
+    }
+  }
+
+  // Control column widths
   Map<int, TableColumnWidth> get columnWidths {
     final widths = <int, TableColumnWidth>{};
     for (int i = 0; i < tableHeaders.length; i++) {
@@ -62,32 +84,52 @@ class _TableOrderState extends State<TableOrder> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.listOrder[0] == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+    final totalPages = (tableData.length / itemsPerPage).ceil();
+
     return Column(
       children: [
+        // Header row with export, dropdown, and add button
         Container(
-          padding: const EdgeInsets.symmetric(vertical: 5.0),
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12.5, horizontal: 20),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Order List',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(fontSize: 14, fontWeight: FontWeight.bold)),
-              IntrinsicWidth(
-                child: MultiSelectDropdownButton(
-                  items: ['Name', 'Description', 'Price', 'Date', 'Status'],
-                  selectedItems: dropdownValues,
-                  onSelectionChanged: (selected) {
-                    setState(() => dropdownValues = selected);
-                  },
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  TableButton(
+                    child: Row(
+                      children: [
+                        Icon(Icons.upload_sharp, color: Colors.grey),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Export Data',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(fontSize: 11.sp),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  MultiSelectDropdownButton(
+                    items: ['Name', 'Description', 'Price', 'Date', 'Status'],
+                    selectedItems: dropdownValues,
+                    onSelectionChanged: (selected) {
+                      setState(() => dropdownValues = selected);
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(width: 20),
               ButtonGeneral(
                 icon: Icon(Icons.add_circle_outline, color: Colors.white),
                 label: Text('Tambahkan'),
@@ -96,6 +138,7 @@ class _TableOrderState extends State<TableOrder> {
             ],
           ),
         ),
+        // Table displaying headers and visible data rows
         Table(
           columnWidths: columnWidths,
           children: [
@@ -103,14 +146,16 @@ class _TableOrderState extends State<TableOrder> {
               decoration: BoxDecoration(
                 color: Colors.grey.shade200,
                 border: Border.symmetric(
-                    horizontal:
-                        BorderSide(color: Colors.grey.withOpacity(0.2))),
+                  horizontal: BorderSide(
+                    color: Colors.grey.withOpacity(0.2),
+                  ),
+                ),
               ),
               children: tableHeaders
                   .map((header) => TableHeader(title: header))
                   .toList(),
             ),
-            ...tableData.map(
+            ...visibleData.map(
               (row) => TableRow(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -123,6 +168,33 @@ class _TableOrderState extends State<TableOrder> {
               ),
             ),
           ],
+        ),
+        // Footer with page info and pagination controls
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 12.5, horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(10.0)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Showing ${visibleData.length} of ${tableData.length}',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(fontSize: 11.sp),
+              ),
+              ScrollPages(
+                totalPages: totalPages,
+                selectedPage: currentPage,
+                onPageChanged: (page) {
+                  setState(() => currentPage = page!);
+                },
+              ),
+            ],
+          ),
         ),
       ],
     );
