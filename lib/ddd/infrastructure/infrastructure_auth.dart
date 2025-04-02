@@ -73,9 +73,20 @@ class InfrastructureAuth implements RepoAuth {
   }
 
   @override
-  Future<List<AuthResponse>> readListUser(UserType userType) {
-    // TODO: implement readListUser
-    throw UnimplementedError();
+  Future<List<AuthResponse>> readListUser(UserType userType) async {
+    try {
+      final res = await Supabase.instance.client.auth.admin.listUsers();
+      print(res);
+      return res
+          .map((e) => AuthResponse(
+                user: e,
+                session: null,
+              ))
+          .toList();
+    } catch (e) {
+      print('List user error: $e');
+      return throw Exception('An unexpected error occurred');
+    }
   }
 
   @override
