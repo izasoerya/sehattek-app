@@ -19,21 +19,26 @@ class ButtonOauth extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          backgroundColor: Colors.transparent,
-          side: BorderSide(color: Colors.grey.shade400),
+          backgroundColor: Colors.grey.shade500,
+          side: BorderSide(color: Colors.grey.shade200),
           elevation: 0,
         ),
         onPressed: onPressed,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (icon != null) Icon(icon),
+            if (icon != null)
+              Icon(
+                icon,
+                color: Colors.white,
+              ),
             SizedBox(width: icon != null ? 10 : 0),
             Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
             ),
           ],
