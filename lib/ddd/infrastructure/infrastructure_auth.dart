@@ -1,4 +1,5 @@
 import 'package:sehattek_app/core/utils/enumeration.dart';
+import 'package:sehattek_app/ddd/domain/entities/entities_provider.dart';
 import 'package:sehattek_app/ddd/domain/repository/repo_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -19,10 +20,6 @@ class InfrastructureAuth implements RepoAuth {
         password: password,
         data: {'username': name, 'phone': phone},
       );
-      await Supabase.instance.client.from('provider_profile').insert({
-        'uid': response.user!.id,
-        'name': response.user!.userMetadata?['username'] ?? 'Unknown User',
-      });
       if (response.user == null || response.session == null) {
         return throw Exception('User or session is null');
       }
@@ -73,15 +70,11 @@ class InfrastructureAuth implements RepoAuth {
   }
 
   @override
-  Future<List<AuthResponse>> readListUser(UserType userType) async {
+  Future<List<EntitiesProvider>> readListUser(UserType userType) async {
     try {
-      final res = await Supabase.instance.client.auth.admin.listUsers();
-      print(res);
+      final res = await Supabase.instance.client.from('users').select();
       return res
-          .map((e) => AuthResponse(
-                user: e,
-                session: null,
-              ))
+          .map((provider) => EntitiesProvider.fromJSON(provider))
           .toList();
     } catch (e) {
       print('List user error: $e');

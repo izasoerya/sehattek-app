@@ -5,7 +5,8 @@ abstract class AuthenticationEvent {}
 class LoginEvent extends AuthenticationEvent {
   final String email;
   final String password;
-  LoginEvent(this.email, this.password);
+  final bool isAdmin;
+  LoginEvent(this.email, this.password, this.isAdmin);
 }
 
 class RegisterEvent extends AuthenticationEvent {
@@ -13,8 +14,9 @@ class RegisterEvent extends AuthenticationEvent {
   final String password;
   final String name;
   final String phone;
+  final bool isAdmin;
 
-  RegisterEvent(this.email, this.password, this.name, this.phone);
+  RegisterEvent(this.email, this.password, this.name, this.phone, this.isAdmin);
 }
 
 class UserLoggedInEvent extends AuthenticationEvent {

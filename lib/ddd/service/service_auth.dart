@@ -22,6 +22,7 @@ class ServiceAuth {
     String name,
     String phone,
   ) async {
+    print('email: $email');
     final res = await InfrastructureAuth().signUp(
       email,
       password,
@@ -41,16 +42,6 @@ class ServiceAuth {
 
   Future<List<EntitiesProvider>> fetchListProvider() async {
     final res = await InfrastructureAuth().readListUser(UserType.provider);
-    List<EntitiesProvider> listUser = res.map((user) {
-      return EntitiesProvider(
-        uid: user.user!.id,
-        name: user.user!.userMetadata?['username'] ?? 'Unknown User',
-        phoneNumber: user.user!.phone ?? '',
-        email: user.user!.email ?? '',
-        password: user.session!.accessToken,
-        createdAt: DateTime.parse(user.user!.createdAt),
-      );
-    }).toList();
-    return listUser;
+    return res;
   }
 }
