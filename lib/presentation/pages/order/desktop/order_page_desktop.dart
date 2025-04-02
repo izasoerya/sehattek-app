@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sehattek_app/core/widgets/molecule/footer.dart';
 import 'package:sehattek_app/core/widgets/molecule/header.dart';
 import 'package:sehattek_app/core/widgets/molecule/table_order.dart';
-import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
-import 'package:sehattek_app/ddd/domain/entities/entities_status_product.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_state.dart';
 import 'package:sehattek_app/presentation/blocs/order/order_bloc.dart';
@@ -21,8 +19,6 @@ class OrderPageDesktop extends StatefulWidget {
 }
 
 class _OrderPageDesktopState extends State<OrderPageDesktop> {
-  List<Map<EntitiesServiceProduct, EntitiesStatusProduct>?> listOrder = [null];
-
   @override
   void initState() {
     super.initState();
@@ -38,34 +34,31 @@ class _OrderPageDesktopState extends State<OrderPageDesktop> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OrderBloc, OrderState>(builder: (context, state) {
-      if (state is OrderStateLoading) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      } else if (state is OrderStateSuccess) {
-        (listOrder = state.listOrder);
-        return SingleChildScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Header(),
-              SizedBox(height: 10.sh),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 5.w),
-                constraints: BoxConstraints(minHeight: 60.h),
-                child: TableOrder(listOrder: listOrder),
-              ),
-              SizedBox(height: 10.sh),
-              Footer(),
-            ],
+    return SingleChildScrollView(
+      physics: AlwaysScrollableScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Header(),
+          SizedBox(height: 10.sh),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 5.w),
+            constraints: BoxConstraints(minHeight: 60.h),
+            child: BlocBuilder<OrderBloc, OrderState>(
+              builder: (context, state) {
+                if (state is OrderStateLoading) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (state is OrderStateSuccess) {
+                  return TableOrder(listOrder: state.listOrder);
+                }
+                return Center(child: Text('Unexpected state'));
+              },
+            ),
           ),
-        );
-      }
-      return Center(
-        child: Text('An unexpected error occurred'),
-      );
-    });
+          SizedBox(height: 10.sh),
+          Footer(),
+        ],
+      ),
+    );
   }
 }
