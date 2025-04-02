@@ -44,7 +44,7 @@ class _TableOrderState extends State<TableOrder> {
 
   // Pagination state
   int currentPage = 1;
-  final int itemsPerPage = 6;
+  final int itemsPerPage = 10;
 
   /// Full table data extracted from listOrder as a list of TableRowData.
   List<TableRowData> get tableData {
@@ -73,9 +73,9 @@ class _TableOrderState extends State<TableOrder> {
       if (dropdownValues.contains('Status')) {
         row.add(status.statusType.toString());
       }
-      // Do not add product.uid here because we want to keep it hidden.
       data.add(TableRowData(uid: product.uid, displayRow: row));
     }
+    data.sort((a, b) => a.displayRow[0].compareTo(b.displayRow[0]));
     return data;
   }
 
@@ -178,6 +178,7 @@ class _TableOrderState extends State<TableOrder> {
                   ),
                 ),
                 children: rowData.displayRow.asMap().entries.map((entry) {
+                  // Sort by name
                   int index = entry.key;
                   String cellValue = entry.value;
                   if (index == 4) {
