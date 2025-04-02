@@ -4,20 +4,20 @@ import 'package:sizer/sizer.dart';
 
 class DropdownTable extends StatefulWidget {
   final StatusType statusType;
+  final void Function(StatusType) onChanged;
 
-  const DropdownTable({super.key, required this.statusType});
+  const DropdownTable(
+      {super.key, required this.statusType, required this.onChanged});
 
   @override
   State<DropdownTable> createState() => _DropdownTableState();
 }
 
 class _DropdownTableState extends State<DropdownTable> {
-  late StatusType selectedStatusType = widget.statusType;
-
   @override
   Widget build(BuildContext context) {
     return DropdownButton<String>(
-      value: selectedStatusType.status,
+      value: widget.statusType.status,
       icon: SizedBox(),
       underline: SizedBox(),
       items: StatusType.values.map((e) {
@@ -53,9 +53,7 @@ class _DropdownTableState extends State<DropdownTable> {
         );
       }).toList(),
       onChanged: (String? newValue) {
-        setState(() {
-          selectedStatusType = StatusType.fromString(newValue!);
-        });
+        widget.onChanged(StatusType.fromString(newValue!));
       },
     );
   }

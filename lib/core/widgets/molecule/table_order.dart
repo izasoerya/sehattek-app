@@ -1,29 +1,39 @@
 import 'dart:math';
-import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sehattek_app/core/utils/enumeration.dart';
 import 'package:sehattek_app/core/widgets/atom/button_general.dart';
 import 'package:sehattek_app/core/widgets/atom/custom_table_cell.dart';
-import 'package:sehattek_app/core/widgets/molecule/scroll_pages.dart';
 import 'package:sehattek_app/core/widgets/atom/table_button.dart';
 import 'package:sehattek_app/core/widgets/atom/table_header.dart';
 import 'package:sehattek_app/core/widgets/atom/multi_select_dropdown_button.dart';
+import 'package:sehattek_app/core/widgets/atom/dropdown_table.dart';
+import 'package:sehattek_app/core/widgets/molecule/scroll_pages.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_status_product.dart';
+import 'package:sehattek_app/presentation/blocs/order/order_bloc.dart';
+import 'package:sehattek_app/presentation/blocs/order/order_event.dart';
+import 'package:sizer/sizer.dart';
+
+/// A model to hold row data along with the uid for internal use.
+class TableRowData {
+  final String uid;
+  final List<String> displayRow;
+
+  TableRowData({required this.uid, required this.displayRow});
+}
 
 class TableOrder extends StatefulWidget {
   final List<Map<EntitiesServiceProduct, EntitiesStatusProduct>?> listOrder;
 
-  const TableOrder({
-    super.key,
-    this.listOrder = const [],
-  });
+  const TableOrder({super.key, this.listOrder = const []});
 
   @override
   State<TableOrder> createState() => _TableOrderState();
 }
 
 class _TableOrderState extends State<TableOrder> {
-  List<String> get tableHeaders => dropdownValues;
+  // Dropdown fields that determine which columns to show
   List<String> dropdownValues = [
     'Name',
     'Description',
@@ -36,10 +46,15 @@ class _TableOrderState extends State<TableOrder> {
   int currentPage = 1;
   final int itemsPerPage = 6;
 
-  // Full table data extracted from listOrder
-  List<List<String>> get tableData {
-    return widget.listOrder.map((order) {
-      if (order == null) return ['']; // Null is waiting for data
+  /// Full table data extracted from listOrder as a list of TableRowData.
+  List<TableRowData> get tableData {
+    List<TableRowData> data = [];
+    for (int i = 0; i < widget.listOrder.length; i++) {
+      final order = widget.listOrder[i];
+      if (order == null) {
+        data.add(TableRowData(uid: '', displayRow: ['']));
+        continue;
+      }
       final product = order.keys.first;
       final status = order.values.first;
       List<String> row = [];
@@ -58,12 +73,14 @@ class _TableOrderState extends State<TableOrder> {
       if (dropdownValues.contains('Status')) {
         row.add(status.statusType.toString());
       }
-      return row;
-    }).toList();
+      // Do not add product.uid here because we want to keep it hidden.
+      data.add(TableRowData(uid: product.uid, displayRow: row));
+    }
+    return data;
   }
 
-  // Data to display for the current page
-  List<List<String>> get visibleData {
+  /// Data to display for the current page.
+  List<TableRowData> get visibleData {
     int start = max(0, (currentPage - 1) * itemsPerPage);
     int end = min(start + itemsPerPage, tableData.length);
     if (start < tableData.length) {
@@ -73,10 +90,11 @@ class _TableOrderState extends State<TableOrder> {
     }
   }
 
-  // Control column widths
+  /// Control column widths.
   Map<int, TableColumnWidth> get columnWidths {
     final widths = <int, TableColumnWidth>{};
-    for (int i = 0; i < tableHeaders.length; i++) {
+    for (int i = 0; i < dropdownValues.length; i++) {
+      // For example, make the second column wider.
       widths[i] = FlexColumnWidth(i == 1 ? 2 : 1);
     }
     return widths;
@@ -84,14 +102,10 @@ class _TableOrderState extends State<TableOrder> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.listOrder[0] == null) {
-      return Center(child: CircularProgressIndicator());
-    }
     final totalPages = (tableData.length / itemsPerPage).ceil();
-
     return Column(
       children: [
-        // Header row with export, dropdown, and add button
+        // Header row with export, dropdown, and add button.
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 12.5, horizontal: 20),
@@ -138,38 +152,62 @@ class _TableOrderState extends State<TableOrder> {
             ],
           ),
         ),
-        // Table displaying headers and visible data rows
+        // Table displaying headers and visible data rows.
         Table(
           columnWidths: columnWidths,
           children: [
+            // Header row.
             TableRow(
               decoration: BoxDecoration(
                 color: Colors.grey.shade200,
                 border: Border.symmetric(
-                  horizontal: BorderSide(
-                    color: Colors.grey.withOpacity(0.2),
-                  ),
+                  horizontal: BorderSide(color: Colors.grey.withOpacity(0.2)),
                 ),
               ),
-              children: tableHeaders
+              children: dropdownValues
                   .map((header) => TableHeader(title: header))
                   .toList(),
             ),
+            // Data rows.
             ...visibleData.map(
-              (row) => TableRow(
+              (rowData) => TableRow(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border(
                     bottom: BorderSide(color: Colors.grey.withOpacity(0.2)),
                   ),
                 ),
-                children:
-                    row.map((value) => CustomTableCell(label: value)).toList(),
+                children: rowData.displayRow.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  String cellValue = entry.value;
+                  if (index == 4) {
+                    return CustomTableCell(
+                      label: cellValue,
+                      child: DropdownTable(
+                        statusType: StatusType.fromString(cellValue),
+                        onChanged: (newStatus) => context.read<OrderBloc>().add(
+                              OrderEventUpdateStatus(newStatus, rowData.uid),
+                            ),
+                      ),
+                    );
+                  } else {
+                    return CustomTableCell(
+                      label: cellValue,
+                      child: Text(
+                        cellValue,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(fontSize: 11.sp),
+                      ),
+                    );
+                  }
+                }).toList(),
               ),
             ),
           ],
         ),
-        // Footer with page info and pagination controls
+        // Footer with page info and pagination controls.
         Container(
           padding: const EdgeInsets.symmetric(vertical: 12.5, horizontal: 20),
           decoration: BoxDecoration(

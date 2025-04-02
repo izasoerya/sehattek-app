@@ -38,29 +38,34 @@ class _OrderPageDesktopState extends State<OrderPageDesktop> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<OrderBloc, OrderState>(
-      listener: (context, state) {
-        if (state is OrderStateSuccess) {
-          setState(() => listOrder = state.listOrder);
-        }
-      },
-      child: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Header(),
-            SizedBox(height: 10.sh),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 5.w),
-              constraints: BoxConstraints(minHeight: 60.h),
-              child: TableOrder(listOrder: listOrder),
-            ),
-            SizedBox(height: 10.sh),
-            Footer(),
-          ],
-        ),
-      ),
-    );
+    return BlocBuilder<OrderBloc, OrderState>(builder: (context, state) {
+      if (state is OrderStateLoading) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      } else if (state is OrderStateSuccess) {
+        (listOrder = state.listOrder);
+        return SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Header(),
+              SizedBox(height: 10.sh),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 5.w),
+                constraints: BoxConstraints(minHeight: 60.h),
+                child: TableOrder(listOrder: listOrder),
+              ),
+              SizedBox(height: 10.sh),
+              Footer(),
+            ],
+          ),
+        );
+      }
+      return Center(
+        child: Text('An unexpected error occurred'),
+      );
+    });
   }
 }

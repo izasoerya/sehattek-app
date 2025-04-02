@@ -1,33 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:sehattek_app/core/utils/enumeration.dart';
-import 'package:sehattek_app/core/widgets/atom/dropdown_table.dart';
-import 'package:sizer/sizer.dart';
 
 class CustomTableCell extends StatefulWidget {
+  final Widget? child;
   final String label;
 
-  const CustomTableCell({super.key, required this.label});
+  const CustomTableCell({super.key, required this.label, this.child});
 
   @override
   State<CustomTableCell> createState() => _CustomTableCellState();
 }
 
 class _CustomTableCellState extends State<CustomTableCell> {
+  StatusType type = StatusType.pending;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 40,
-      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 7.5),
-      alignment: Alignment.centerLeft,
-      decoration: BoxDecoration(),
-      child: !widget.label.contains('Status')
-          ? Text(
-              widget.label,
-              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    fontSize: 11.sp,
-                  ),
-            )
-          : DropdownTable(statusType: StatusType.fromString(widget.label)),
-    );
+        height: 40,
+        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 7.5),
+        alignment: Alignment.centerLeft,
+        decoration: BoxDecoration(),
+        child: widget.child);
   }
 }
