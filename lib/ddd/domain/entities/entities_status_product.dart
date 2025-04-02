@@ -18,10 +18,10 @@ class EntitiesStatusProduct {
   factory EntitiesStatusProduct.fromJSON(Map<String, dynamic> map) {
     return EntitiesStatusProduct(
       uid: map["uid"],
-      statusType: map["status_type"],
+      statusType: StatusType.fromString(map["type"]),
       detailInfo: map["detail_info"],
-      updatedAt: map["updated_at"],
-      createdAt: map["created_at"],
+      updatedAt: DateTime.parse(map["updated_at"]),
+      createdAt: DateTime.parse(map["created_at"]),
     );
   }
 }

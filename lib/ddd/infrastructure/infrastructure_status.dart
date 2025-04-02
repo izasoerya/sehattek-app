@@ -21,6 +21,7 @@ class InfrastructureStatus implements RepoStatus {
           .select()
           .eq('uid', statusId)
           .single();
+
       return EntitiesStatusProduct.fromJSON(res);
     } catch (e) {
       print('Error fetching status: $e');
@@ -43,7 +44,7 @@ class InfrastructureStatus implements RepoStatus {
           .eq('provider_id', providerId);
       return res.map((e) => EntitiesStatusProduct.fromJSON(e)).toList();
     } on Exception catch (e) {
-      print('error fetching status: $e');
+      print('error fetching list status: $e');
       return [];
     }
   }

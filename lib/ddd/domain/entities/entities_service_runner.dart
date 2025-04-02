@@ -36,4 +36,15 @@ class EntitiesServiceRunner {
       'created_at': createdAt.toIso8601String(),
     };
   }
+
+  static EntitiesServiceRunner empty() {
+    return EntitiesServiceRunner(
+      uid: '',
+      uidProvider: '',
+      uidStatusProduct: '',
+      uidServiceProduct: '',
+      updatedAt: DateTime.now(),
+      createdAt: DateTime.now(),
+    );
+  }
 }
