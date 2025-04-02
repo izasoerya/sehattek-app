@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class AuthContainer extends StatelessWidget {
   final Widget child;
@@ -11,8 +12,8 @@ class AuthContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: width ?? 350,
-      height: height ?? 430,
+      width: 25.sw,
+      height: 65.sh,
       padding: const EdgeInsets.only(
         left: 30,
         right: 30,
