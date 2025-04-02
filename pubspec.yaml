@@ -15,6 +15,7 @@ dependencies:
   sizer: ^3.0.3
   flutter_dotenv: ^5.2.1
   responsive_framework: ^1.5.1
+  date_picker_plus: ^4.2.0
 
 dev_dependencies:
   flutter_test:
