@@ -1,3 +1,5 @@
+import 'package:sehattek_app/core/utils/enumeration.dart';
+
 abstract class OrderEvent {}
 
 class OrderEventFetch extends OrderEvent {
@@ -16,4 +18,11 @@ class OrderEventFetchListWithStatus extends OrderEvent {
   final String providerId;
 
   OrderEventFetchListWithStatus(this.providerId);
+}
+
+class OrderEventUpdateStatus extends OrderEvent {
+  final String productId;
+  final StatusType statusType;
+
+  OrderEventUpdateStatus(this.statusType, this.productId);
 }
