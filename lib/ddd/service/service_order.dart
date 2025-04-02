@@ -1,4 +1,6 @@
+import 'package:sehattek_app/core/utils/enumeration.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
+import 'package:sehattek_app/ddd/domain/entities/entities_service_runner.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_status_product.dart';
 import 'package:sehattek_app/ddd/infrastructure/infrastructure_product.dart';
 import 'package:sehattek_app/ddd/infrastructure/infrastructure_runner.dart';
@@ -39,5 +41,12 @@ class ServiceOrder {
         .where((element) => element != null)
         .cast<Map<EntitiesServiceProduct, EntitiesStatusProduct>>()
         .toList();
+  }
+
+  Future<List<EntitiesServiceRunner>> updateStatusOrder(
+      StatusType statusType, String productId) async {
+    final res =
+        await InfrastructureRunner().updateStatusProduct(statusType, productId);
+    return res;
   }
 }
