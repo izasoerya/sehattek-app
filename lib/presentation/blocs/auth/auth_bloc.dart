@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sehattek_app/ddd/domain/entities/entities_admin.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_provider.dart';
 import 'package:sehattek_app/ddd/service/service_auth.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_event.dart';
@@ -47,7 +48,7 @@ class AuthenticationBloc
     on<LoginEvent>(_onLogin);
     on<RegisterEvent>(_onRegister);
     on<UserLoggedInEvent>(
-      (event, emit) => emit(UserLoggedIn(event.user)),
+      (event, emit) => emit(UserLoggedIn(event.user, event.admin)),
     );
     on<UserLoggedOutEvent>(
       (event, emit) => emit(AuthenticationUnauthenticated()),
@@ -68,29 +69,17 @@ class AuthenticationBloc
         return;
       }
       if (event.isAdmin) {
-        // Check if the admin status matches
-        final userMetadata = response.user?.userMetadata;
-        final isAdmin = userMetadata?['isAdmin'] ?? false;
-
-        if (isAdmin == event.isAdmin) {
-          // If the admin status matches, emit UserLoggedIn
-          final user = EntitiesProvider(
-            uid: response.user!.id,
-            name: userMetadata?['username'] ?? 'Unknown User',
-            phoneNumber: response.user!.phone ?? '',
-            email: response.user!.email ?? '',
-            password: response.session!.accessToken,
-            createdAt: DateTime.parse(response.user!.createdAt),
-          );
-          emit(UserLoggedIn(user));
-        } else {
-          // If the admin status does not match, emit a failure
-          emit(AuthenticationFailure(event.isAdmin
-              ? 'Admin access required'
-              : 'User access required'));
-        }
+        // If the user is an admin, emit UserLoggedIn with admin
+        final user = EntitiesAdmin(
+          uid: response.user!.id,
+          name: response.user!.userMetadata!['username'] ?? 'Unknown User',
+          email: response.user!.email ?? '',
+          password: response.session!.accessToken,
+          createdAt: DateTime.parse(response.user!.createdAt),
+        );
+        emit(UserLoggedIn(null, user));
       } else {
-        // If not an admin, emit UserLoggedIn
+        // If the user is a provider, emit UserLoggedIn with provider
         final user = EntitiesProvider(
           uid: response.user!.id,
           name: response.user!.userMetadata?['username'] ?? 'Unknown User',
@@ -99,7 +88,7 @@ class AuthenticationBloc
           password: response.session!.accessToken,
           createdAt: DateTime.parse(response.user!.createdAt),
         );
-        emit(UserLoggedIn(user));
+        emit(UserLoggedIn(user, null));
       }
     } catch (e) {
       print('Login error: $e');
@@ -111,13 +100,14 @@ class AuthenticationBloc
       RegisterEvent event, Emitter<AuthenticationState> emit) async {
     emit(AuthenticationLoading());
     try {
-      final res = await ServiceAuth().providerSignUp(
+      final res = await ServiceAuth().signUp(
         event.email,
         event.password,
         event.name,
         event.phone,
+        event.isAdmin,
       );
-      emit(UserLoggedIn(res));
+      emit(UserLoggedIn(res.keys.first, res.values.first));
     } catch (e) {
       print('Service error: $e');
       emit(AuthenticationFailure(e.toString()));

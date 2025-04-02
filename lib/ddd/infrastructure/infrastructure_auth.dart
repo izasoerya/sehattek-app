@@ -12,13 +12,14 @@ class InfrastructureAuth implements RepoAuth {
     String password,
     String name,
     String phone,
+    bool admin,
   ) async {
     AuthResponse response = AuthResponse(user: null, session: null);
     try {
       response = await Supabase.instance.client.auth.signUp(
         email: email,
         password: password,
-        data: {'username': name, 'phone': phone},
+        data: {'username': name, 'phone': phone, 'admin': admin},
       );
       if (response.user == null || response.session == null) {
         return throw Exception('User or session is null');

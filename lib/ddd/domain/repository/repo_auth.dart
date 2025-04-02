@@ -8,6 +8,7 @@ abstract class RepoAuth {
     String password,
     String name,
     String phone,
+    bool admin,
   );
   Future<AuthResponse> signIn(String email, String password);
   Future<AuthResponse> readSession();

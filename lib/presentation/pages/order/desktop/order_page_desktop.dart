@@ -24,9 +24,13 @@ class _OrderPageDesktopState extends State<OrderPageDesktop> {
     super.initState();
     final authState = context.read<AuthenticationBloc>().state;
     if (authState is UserLoggedIn) {
-      context
-          .read<OrderBloc>()
-          .add(OrderEventFetchListWithStatus(authState.user.uid));
+      context.read<OrderBloc>().add(
+            OrderEventFetchListWithStatus(
+              authState.user == null
+                  ? authState.admin!.uid
+                  : authState.user!.uid,
+            ),
+          );
     } else {
       router.go('/login');
     }

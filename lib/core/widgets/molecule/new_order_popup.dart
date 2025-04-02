@@ -105,7 +105,8 @@ class _NewOrderPopupState extends State<NewOrderPopup> {
             SizedBox(height: 5),
             DropdownGeneral(
                 providerOptions: widget.listProvider
-                    .map((provider) => provider.toString())
+                    .map((provider) =>
+                        '${provider.name.toString()} (${provider.email.toString()})')
                     .toList()),
             SizedBox(height: 15),
             Row(

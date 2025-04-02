@@ -1,3 +1,4 @@
+import 'package:sehattek_app/ddd/domain/entities/entities_admin.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_provider.dart';
 
 abstract class AuthenticationEvent {}
@@ -20,8 +21,10 @@ class RegisterEvent extends AuthenticationEvent {
 }
 
 class UserLoggedInEvent extends AuthenticationEvent {
-  final EntitiesProvider user;
-  UserLoggedInEvent(this.user);
+  final EntitiesProvider? user;
+  final EntitiesAdmin? admin;
+
+  UserLoggedInEvent(this.user, this.admin);
 }
 
 class UserLoggedOutEvent extends AuthenticationEvent {}

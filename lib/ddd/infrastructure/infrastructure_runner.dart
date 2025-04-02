@@ -21,11 +21,15 @@ class InfrastructureRunner implements RepoRunner {
 
   @override
   Future<List<EntitiesServiceRunner>> readListRunner(String providerId) async {
+    PostgrestList res;
     try {
-      final res = await Supabase.instance.client
+      res = await Supabase.instance.client
           .from('service_runner')
           .select()
           .eq('uid_provider', providerId);
+      if (res.isEmpty) {
+        res = await Supabase.instance.client.from('service_runner').select();
+      }
       return res.map((e) => EntitiesServiceRunner.fromJSON(e)).toList();
     } on Exception catch (e) {
       print('error fetching runner: $e');
