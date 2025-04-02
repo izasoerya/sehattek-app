@@ -25,13 +25,15 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
   final _password = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  bool admin = true;
+  void adminCallback(bool isAdmin) => admin = isAdmin;
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, snapshot) {
         if (snapshot is UserLoggedIn) {
           router.go('/dashboard');
-          print(snapshot.user!.email);
         }
       },
       child: Column(
@@ -58,7 +60,7 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
                         ],
                       ),
                       const Spacer(),
-                      const ToggleButtonGeneral(),
+                      ToggleButtonGeneral(onChanged: adminCallback),
                       const Spacer(),
                       TextInput(
                         controller: _email,
@@ -91,7 +93,11 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
                               _email.text.isNotEmpty &&
                               _password.text.isNotEmpty) {
                             context.read<AuthenticationBloc>().add(
-                                  LoginEvent(_email.text, _password.text),
+                                  LoginEvent(
+                                    _email.text,
+                                    _password.text,
+                                    admin,
+                                  ),
                                 );
                           }
                         },

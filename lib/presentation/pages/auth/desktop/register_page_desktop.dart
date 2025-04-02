@@ -25,6 +25,9 @@ class _RegisterPageDesktopState extends State<RegisterPageDesktop> {
   final _password = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  bool admin = true;
+  void adminCallback(bool isAdmin) => admin = isAdmin;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -51,7 +54,7 @@ class _RegisterPageDesktopState extends State<RegisterPageDesktop> {
                       ],
                     ),
                     const Spacer(),
-                    const ToggleButtonGeneral(),
+                    ToggleButtonGeneral(onChanged: adminCallback),
                     const Spacer(),
                     TextInput(
                       controller: _name,
@@ -95,10 +98,11 @@ class _RegisterPageDesktopState extends State<RegisterPageDesktop> {
                             _password.text.isNotEmpty) {
                           context.read<AuthenticationBloc>().add(
                                 (RegisterEvent(
-                                  _name.text,
-                                  _phone.text,
                                   _email.text,
                                   _password.text,
+                                  _name.text,
+                                  _phone.text,
+                                  admin,
                                 )),
                               );
                           router.go('/login');
