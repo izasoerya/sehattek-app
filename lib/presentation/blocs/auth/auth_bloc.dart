@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_admin.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_provider.dart';
@@ -11,39 +13,64 @@ class AuthenticationBloc
   final SupabaseClient _supabaseClient = Supabase.instance.client;
 
   AuthenticationBloc() : super(AuthenticationInitial()) {
-    // final currentSession = _supabaseClient.auth.currentSession;
-    // if (currentSession != null) {
-    //   final user = EntitiesProvider(
-    //     uid: currentSession.user.id,
-    //     name: currentSession.user.userMetadata?['username'] ?? 'Unknown User',
-    //     phoneNumber: currentSession.user.phone ?? '',
-    //     email: currentSession.user.email ?? '',
-    //     password: currentSession.accessToken,
-    //     createdAt: DateTime.parse(currentSession.user.createdAt),
-    //   );
-    //   emit(UserLoggedIn(user));
-    // } else {
-    //   emit(AuthenticationUnauthenticated());
-    // }
+    final currentSession = _supabaseClient.auth.currentSession;
+    if (currentSession != null) {
+      final bool isAdmin =
+          currentSession.user.userMetadata?['isAdmin'] ?? false;
+      if (!isAdmin) {
+        final provider = EntitiesProvider(
+          uid: currentSession.user.id,
+          name: currentSession.user.userMetadata?['username'] ?? 'Unknown User',
+          phoneNumber: currentSession.user.phone ?? '',
+          email: currentSession.user.email ?? '',
+          password: currentSession.accessToken,
+          createdAt: DateTime.parse(currentSession.user.createdAt),
+        );
+        emit(UserLoggedIn(provider, null));
+      } else {
+        final admin = EntitiesAdmin(
+          uid: currentSession.user.id,
+          name: currentSession.user.userMetadata?['username'] ?? 'Unknown User',
+          email: currentSession.user.email ?? '',
+          password: currentSession.accessToken,
+          createdAt: DateTime.parse(currentSession.user.createdAt),
+        );
+        emit(UserLoggedIn(null, admin));
+      }
+    } else {
+      emit(AuthenticationUnauthenticated());
+    }
 
-    // _supabaseClient.auth.onAuthStateChange.listen((data) {
-    //   final event = data.event;
-    //   final session = data.session;
+    _supabaseClient.auth.onAuthStateChange.listen((data) {
+      final event = data.event;
+      final session = data.session;
+      if (event == AuthChangeEvent.signedIn && session != null) {
+        final bool isAdmin = session.user.userMetadata?['isAdmin'] ?? false;
 
-    //   if (event == AuthChangeEvent.signedIn && session != null) {
-    //     final user = EntitiesProvider(
-    //       uid: session.user.id,
-    //       name: session.user.userMetadata?['username'] ?? 'Unknown User',
-    //       phoneNumber: session.user.phone ?? '',
-    //       email: session.user.email ?? '',
-    //       password: session.accessToken,
-    //       createdAt: DateTime.parse(session.user.createdAt),
-    //     );
-    //     add(UserLoggedInEvent(user)); // Dispatch event, not state!
-    //   } else if (event == AuthChangeEvent.signedOut) {
-    //     add(UserLoggedOutEvent());
-    //   }
-    // });
+        if (!isAdmin) {
+          final provider = EntitiesProvider(
+            uid: session.user.id,
+            name: session.user.userMetadata?['username'] ?? 'Unknown User',
+            phoneNumber: session.user.phone ?? '',
+            email: session.user.email ?? '',
+            password: session.accessToken,
+            createdAt: DateTime.parse(session.user.createdAt),
+          );
+          add(UserLoggedInEvent(provider, null));
+        } else {
+          final admin = EntitiesAdmin(
+            uid: session.user.id,
+            name: session.user.userMetadata?['username'] ?? 'Unknown User',
+            email: session.user.email ?? '',
+            password: session.accessToken,
+            createdAt: DateTime.parse(session.user.createdAt),
+          );
+          add(UserLoggedInEvent(null, admin));
+        }
+      } else if (event == AuthChangeEvent.signedOut) {
+        add(UserLoggedOutEvent());
+      }
+    });
 
     on<LoginEvent>(_onLogin);
     on<RegisterEvent>(_onRegister);
