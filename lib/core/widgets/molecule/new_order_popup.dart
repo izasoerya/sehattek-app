@@ -6,12 +6,18 @@ import 'package:sehattek_app/core/widgets/atom/date_picker_general.dart';
 import 'package:sehattek_app/core/widgets/atom/dropdown_general.dart';
 import 'package:sehattek_app/core/widgets/atom/text_input.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_provider.dart';
+import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
 import 'package:sizer/sizer.dart';
 
 class NewOrderPopup extends StatefulWidget {
   final List<EntitiesProvider> listProvider;
+  final void Function(Map<EntitiesServiceProduct, EntitiesProvider>) onSubmit;
 
-  const NewOrderPopup({super.key, this.listProvider = const []});
+  const NewOrderPopup({
+    super.key,
+    required this.listProvider,
+    required this.onSubmit,
+  });
 
   @override
   State<NewOrderPopup> createState() => _NewOrderPopupState();
@@ -33,6 +39,21 @@ class _NewOrderPopupState extends State<NewOrderPopup> {
     _deadlineController.dispose();
     super.dispose();
   }
+
+  DateTime selectedDate = DateTime.now();
+  void _onDateSelected(DateTime date) {
+    setState(() {
+      selectedDate = date;
+      _deadlineController.text = date.toString();
+    });
+  }
+
+  EntitiesProvider? selectedProvider;
+  void _onProviderSelected(String selectedProvider) =>
+      setState(() => this.selectedProvider = widget.listProvider.firstWhere(
+            (provider) =>
+                '${provider.name} (${provider.email})' == selectedProvider,
+          ));
 
   @override
   Widget build(BuildContext context) {
@@ -96,18 +117,21 @@ class _NewOrderPopupState extends State<NewOrderPopup> {
             ),
             DatePickerGeneral(
               onDateSelected: (p0) {
-                print('Selected date: $p0');
+                _onDateSelected(p0);
                 setState(() {
                   _deadlineController.text = p0.toString();
+                  selectedDate = p0;
                 });
               },
             ),
             SizedBox(height: 5),
             DropdownGeneral(
-                providerOptions: widget.listProvider
-                    .map((provider) =>
-                        '${provider.name.toString()} (${provider.email.toString()})')
-                    .toList()),
+              selectedProvider: _onProviderSelected,
+              providerOptions: widget.listProvider
+                  .map((provider) =>
+                      '${provider.name.toString()} (${provider.email.toString()})')
+                  .toList(),
+            ),
             SizedBox(height: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -116,9 +140,21 @@ class _NewOrderPopupState extends State<NewOrderPopup> {
                     label: ('Cancel'), onPressed: () => Navigator.pop(context)),
                 SizedBox(width: 10),
                 ButtonGeneral(
-                  label: Text('Submit'),
-                  onPressed: () => Navigator.pop(context),
-                ),
+                    label: Text('Submit'),
+                    onPressed: () {
+                      widget.onSubmit({
+                        EntitiesServiceProduct(
+                          uid: '03b24cf4-f010-45e2-ac35-61216e8fd599',
+                          name: _orderNameController.text,
+                          description: _descriptionController.text,
+                          price: _priceController.text,
+                          customerName: _customerNameController.text,
+                          orderDate: selectedDate,
+                          createdAt: DateTime.now(),
+                          updatedAt: DateTime.now(),
+                        ): selectedProvider!
+                      });
+                    }),
               ],
             ),
           ],

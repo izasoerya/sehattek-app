@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:sehattek_app/ddd/service/service_auth.dart';
+import 'package:sehattek_app/ddd/domain/entities/entities_provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,8 +16,8 @@ import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_status_product.dart';
 import 'package:sehattek_app/presentation/blocs/order/order_bloc.dart';
 import 'package:sehattek_app/presentation/blocs/order/order_event.dart';
+import 'package:sehattek_app/ddd/service/service_auth.dart';
 
-/// A model to hold row data along with the uid for internal use.
 class TableRowData {
   final String uid;
   final List<String> displayRow;
@@ -178,6 +178,12 @@ class _TableOrderState extends State<TableOrder> {
                           } else if (snapshot.hasData) {
                             return NewOrderPopup(
                               listProvider: snapshot.data!,
+                              onSubmit:
+                                  (Map<EntitiesServiceProduct, EntitiesProvider>
+                                          data) =>
+                                      context.read<OrderBloc>().add(
+                                          OrderEventCreate(data.keys.first,
+                                              data.values.first.uid)),
                             );
                           }
                           return Center(

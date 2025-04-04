@@ -3,14 +3,21 @@ import 'package:sizer/sizer.dart';
 
 class DropdownGeneral extends StatefulWidget {
   final List<String> providerOptions;
+  final void Function(String) selectedProvider;
 
-  const DropdownGeneral({super.key, required this.providerOptions});
+  const DropdownGeneral({
+    super.key,
+    required this.providerOptions,
+    required this.selectedProvider,
+  });
 
   @override
   State<DropdownGeneral> createState() => _DropdownGeneralState();
 }
 
 class _DropdownGeneralState extends State<DropdownGeneral> {
+  String? selectedProvider;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -47,7 +54,7 @@ class _DropdownGeneralState extends State<DropdownGeneral> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    'Select Provider',
+                    selectedProvider ?? 'Select Provider',
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           fontSize: 10.5.sp,
                         ),
@@ -66,7 +73,14 @@ class _DropdownGeneralState extends State<DropdownGeneral> {
                   ),
                 );
               }).toList(),
-              onChanged: (_) {}),
+              onChanged: (name) {
+                if (name != null) {
+                  setState(() {
+                    selectedProvider = name;
+                    widget.selectedProvider(name);
+                  });
+                }
+              }),
         ),
       ],
     );
