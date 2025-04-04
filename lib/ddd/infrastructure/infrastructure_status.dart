@@ -9,7 +9,6 @@ class InfrastructureStatus implements RepoStatus {
   @override
   Future<EntitiesStatusProduct> createStatus(
       EntitiesStatusProduct status) async {
-    // TODO: implement createStatus
     throw UnimplementedError();
   }
 
@@ -21,7 +20,6 @@ class InfrastructureStatus implements RepoStatus {
           .select()
           .eq('uid', statusId)
           .single();
-
       return EntitiesStatusProduct.fromJSON(res);
     } catch (e) {
       print('Error fetching status: $e');

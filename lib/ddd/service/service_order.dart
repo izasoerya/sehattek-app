@@ -7,6 +7,22 @@ import 'package:sehattek_app/ddd/infrastructure/infrastructure_runner.dart';
 import 'package:sehattek_app/ddd/infrastructure/infrastructure_status.dart';
 
 class ServiceOrder {
+  Future<EntitiesServiceProduct> createOrder(
+      EntitiesServiceProduct order, String providerId) async {
+    final res = await InfrastructureProduct().createProduct(order);
+    final res2 = await InfrastructureRunner().createRunner(
+      EntitiesServiceRunner(
+        uid: '03b24cf4-f010-45e2-ac35-61216e8fd599',
+        uidServiceProduct: res.data!.uid,
+        uidProvider: providerId,
+        uidStatusProduct: StatusType.pending.uid,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
+    return res.data!;
+  }
+
   Future<List<EntitiesServiceProduct>> readListProduct(
       String providerId) async {
     final res = await InfrastructureProduct().readListProduct(providerId);

@@ -9,8 +9,17 @@ class InfrastructureRunner implements RepoRunner {
   @override
   Future<EntitiesServiceRunner> createRunner(
       EntitiesServiceRunner runner) async {
-    // TODO: implement createRunner
-    throw UnimplementedError();
+    try {
+      final res = await Supabase.instance.client
+          .from('service_runner')
+          .insert(runner.toJSON())
+          .select()
+          .single();
+      return EntitiesServiceRunner.fromJSON(res);
+    } on Exception catch (e) {
+      print('Error creating runner: $e');
+      return throw Exception('Error creating runner: $e');
+    }
   }
 
   @override

@@ -6,9 +6,23 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class InfrastructureProduct implements RepoProduct {
   @override
-  Future<ErrorWrapper> createProduct(EntitiesServiceProduct product) {
-    // TODO: implement createProduct
-    throw UnimplementedError();
+  Future<ErrorWrapper> createProduct(EntitiesServiceProduct product) async {
+    try {
+      print('Creating product: ${product.toJSON()}');
+      final res = await Supabase.instance.client
+          .from('service_product')
+          .insert(product.toJSON())
+          .select()
+          .single();
+      return ErrorWrapper(
+          message: '', type: null, data: EntitiesServiceProduct.fromJSON(res));
+    } on Exception catch (e) {
+      print('Error creating product: $e');
+      return ErrorWrapper(
+          message: 'Error creating product: $e',
+          type: ErrorType.unknown,
+          data: null);
+    }
   }
 
   @override
