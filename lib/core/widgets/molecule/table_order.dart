@@ -1,28 +1,48 @@
 import 'dart:math';
-import 'package:sehattek_app/ddd/domain/entities/entities_provider.dart';
-import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sehattek_app/core/utils/enumeration.dart';
 import 'package:sehattek_app/core/widgets/atom/button_general.dart';
 import 'package:sehattek_app/core/widgets/atom/custom_table_cell.dart';
+import 'package:sehattek_app/core/widgets/atom/dropdown_table.dart';
+import 'package:sehattek_app/core/widgets/atom/multi_select_dropdown_button.dart';
 import 'package:sehattek_app/core/widgets/atom/table_button.dart';
 import 'package:sehattek_app/core/widgets/atom/table_header.dart';
-import 'package:sehattek_app/core/widgets/atom/multi_select_dropdown_button.dart';
-import 'package:sehattek_app/core/widgets/atom/dropdown_table.dart';
-import 'package:sehattek_app/core/widgets/molecule/new_order_popup.dart';
 import 'package:sehattek_app/core/widgets/molecule/scroll_pages.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_status_product.dart';
 import 'package:sehattek_app/presentation/blocs/order/order_bloc.dart';
 import 'package:sehattek_app/presentation/blocs/order/order_event.dart';
-import 'package:sehattek_app/ddd/service/service_auth.dart';
 
 class TableRowData {
-  final String uid;
-  final List<String> displayRow;
+  final List<Map<EntitiesServiceProduct, EntitiesStatusProduct>?> rawOrders;
 
-  TableRowData({required this.uid, required this.displayRow});
+  List<String> filter = ['Name', 'Description', 'Price', 'Date', 'Status'];
+  int itemsPerPage = 10;
+  int currentPage = 1;
+
+  TableRowData({required this.rawOrders});
+
+  List<Map<EntitiesServiceProduct, EntitiesStatusProduct>> get filteredOrders {
+    return rawOrders
+        .whereType<Map<EntitiesServiceProduct, EntitiesStatusProduct>>()
+        .toList();
+  }
+
+  int get totalPages => (filteredOrders.length / itemsPerPage).ceil();
+
+  List<Map<EntitiesServiceProduct, EntitiesStatusProduct>> get visibleOrders {
+    int start = (currentPage - 1) * itemsPerPage;
+    int end = min(start + itemsPerPage, filteredOrders.length);
+    return filteredOrders.sublist(start, end);
+  }
+
+  void updateFilter(List<String> newFilter) {
+    filter = newFilter;
+  }
+
+  void goToPage(int page) {
+    currentPage = page;
+  }
 }
 
 class TableOrder extends StatefulWidget {
@@ -35,254 +55,138 @@ class TableOrder extends StatefulWidget {
 }
 
 class _TableOrderState extends State<TableOrder> {
-  // Dropdown fields that determine which columns to show
-  List<String> dropdownValues = [
-    'Name',
-    'Description',
-    'Price',
-    'Date',
-    'Status'
-  ];
+  late TableRowData tableData;
 
-  // Pagination state
-  int currentPage = 1;
-  final int itemsPerPage = 10;
-
-  /// Full table data extracted from listOrder as a list of TableRowData.
-  List<TableRowData> get tableData {
-    List<TableRowData> data = [];
-    for (int i = 0; i < widget.listOrder.length; i++) {
-      final order = widget.listOrder[i];
-      if (order == null) {
-        data.add(TableRowData(uid: '', displayRow: ['']));
-        continue;
-      }
-      final product = order.keys.first;
-      final status = order.values.first;
-      List<String> row = [];
-      if (dropdownValues.contains('Name')) {
-        row.add(product.name);
-      }
-      if (dropdownValues.contains('Description')) {
-        row.add(product.description);
-      }
-      if (dropdownValues.contains('Price')) {
-        row.add(product.price.toString());
-      }
-      if (dropdownValues.contains('Date')) {
-        row.add(product.orderDate.toString().substring(0, 10));
-      }
-      if (dropdownValues.contains('Status')) {
-        row.add(status.statusType.toString());
-      }
-      data.add(TableRowData(uid: product.uid, displayRow: row));
-    }
-    data.sort((a, b) => a.displayRow[0].compareTo(b.displayRow[0]));
-    return data;
+  @override
+  void initState() {
+    super.initState();
+    tableData = TableRowData(rawOrders: widget.listOrder);
   }
 
-  /// Data to display for the current page.
-  List<TableRowData> get visibleData {
-    int start = max(0, (currentPage - 1) * itemsPerPage);
-    int end = min(start + itemsPerPage, tableData.length);
-    if (start < tableData.length) {
-      return tableData.sublist(start, end);
-    } else {
-      return [];
-    }
-  }
-
-  /// Control column widths.
   Map<int, TableColumnWidth> get columnWidths {
     final widths = <int, TableColumnWidth>{};
-    for (int i = 0; i < dropdownValues.length; i++) {
-      // For example, make the second column wider.
+    for (int i = 0; i < tableData.filter.length; i++) {
       widths[i] = FlexColumnWidth(i == 1 ? 2 : 1);
     }
     return widths;
   }
 
+  List<Widget> _buildRow(
+      EntitiesServiceProduct product, EntitiesStatusProduct status) {
+    List<Widget> row = [];
+    if (tableData.filter.contains('Name')) {
+      row.add(CustomTableCell(label: product.name));
+    }
+    if (tableData.filter.contains('Description')) {
+      row.add(CustomTableCell(label: product.description));
+    }
+    if (tableData.filter.contains('Price')) {
+      row.add(CustomTableCell(label: product.price.toString()));
+    }
+    if (tableData.filter.contains('Date')) {
+      row.add(CustomTableCell(
+          label: product.orderDate.toString().substring(0, 10)));
+    }
+    if (tableData.filter.contains('Status')) {
+      row.add(CustomTableCell(
+        child: DropdownTable(
+          statusType: status.statusType,
+          onChanged: (newStatus) => context.read<OrderBloc>().add(
+                OrderEventUpdateStatus(newStatus, product.uid),
+              ),
+        ),
+      ));
+    }
+    return row;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final totalPages = (tableData.length / itemsPerPage).ceil();
-
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, 3), // changes position of shadow
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 12.5, horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Header row with export, dropdown, and add button.
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 12.5, horizontal: 20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    TableButton(
-                      child: Row(
-                        children: [
-                          Icon(Icons.upload_sharp, color: Colors.grey),
-                          const SizedBox(width: 10),
-                          Text(
-                            'Export Data',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(fontSize: 11.sp),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    MultiSelectDropdownButton(
-                      items: ['Name', 'Description', 'Price', 'Date', 'Status'],
-                      selectedItems: dropdownValues,
-                      onSelectionChanged: (selected) {
-                        setState(() => dropdownValues = selected);
-                      },
-                    ),
-                  ],
-                ),
-                ButtonGeneral(
-                  icon: Icon(Icons.add_circle_outline, color: Colors.white),
-                  label: Text('Tambahkan'),
-                  onPressed: () => showModalCreateOrder(context),
-                ),
-              ],
-            ),
-          ),
-          // Table displaying headers and visible data rows.
-          Table(
-            columnWidths: columnWidths,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Header row.
-              TableRow(
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  border: Border.symmetric(
-                    horizontal: BorderSide(color: Colors.grey.withOpacity(0.2)),
-                  ),
-                ),
-                children: dropdownValues
-                    .map((header) => TableHeader(title: header))
-                    .toList(),
-              ),
-              // Data rows.
-              ...visibleData.map(
-                (rowData) => TableRow(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border(
-                      bottom: BorderSide(color: Colors.grey.withOpacity(0.2)),
+              Row(
+                children: [
+                  TableButton(
+                    child: Row(
+                      children: [
+                        Icon(Icons.upload, color: Colors.grey),
+                        const SizedBox(width: 10),
+                        Text('Export Data'),
+                      ],
                     ),
                   ),
-                  children: rowData.displayRow.asMap().entries.map((entry) {
-                    // Sort by name
-                    int index = entry.key;
-                    String cellValue = entry.value;
-                    if (index == 4) {
-                      return CustomTableCell(
-                        label: cellValue,
-                        child: DropdownTable(
-                          statusType: StatusType.fromString(cellValue),
-                          onChanged: (newStatus) => context
-                              .read<OrderBloc>()
-                              .add(
-                                OrderEventUpdateStatus(newStatus, rowData.uid),
-                              ),
-                        ),
-                      );
-                    } else {
-                      return CustomTableCell(
-                        label: cellValue,
-                        child: Text(
-                          cellValue,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(fontSize: 11.sp),
-                        ),
-                      );
-                    }
-                  }).toList(),
-                ),
+                  const SizedBox(width: 20),
+                  MultiSelectDropdownButton(
+                    items: ['Name', 'Description', 'Price', 'Date', 'Status'],
+                    selectedItems: tableData.filter,
+                    onSelectionChanged: (selected) {
+                      setState(() => tableData.updateFilter(selected));
+                    },
+                  ),
+                ],
+              ),
+              ButtonGeneral(
+                icon: Icon(Icons.add_circle_outline, color: Colors.white),
+                label: Text('Tambahkan'),
+                onPressed: () {},
               ),
             ],
           ),
-          // Footer with page info and pagination controls.
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 12.5, horizontal: 20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius:
-                  BorderRadius.vertical(bottom: Radius.circular(10.0)),
+        ),
+        Table(
+          columnWidths: columnWidths,
+          children: [
+            TableRow(
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+              ),
+              children: tableData.filter
+                  .map((header) => TableHeader(title: header))
+                  .toList(),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Showing ${visibleData.length} of ${tableData.length}',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(fontSize: 11.sp),
-                ),
-                ScrollPages(
-                  totalPages: totalPages,
-                  selectedPage: currentPage,
-                  onPageChanged: (page) {
-                    setState(() => currentPage = page!);
-                  },
-                ),
-              ],
-            ),
+            ...tableData.visibleOrders.map(
+              (rowMap) {
+                final product = rowMap.keys.first;
+                final status = rowMap.values.first;
+                return TableRow(
+                  decoration: BoxDecoration(color: Colors.white),
+                  children: _buildRow(product, status),
+                );
+              },
+            )
+          ],
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 12.5, horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(10.0)),
           ),
-        ],
-      ),
-    );
-  }
-
-  Future<dynamic> showModalCreateOrder(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (context) => FutureBuilder(
-          future: ServiceAuth().fetchListProvider(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(
-                child: Text('Error: ${snapshot.error}'),
-              );
-            } else if (snapshot.hasData) {
-              return NewOrderPopup(
-                listProvider: snapshot.data!,
-                onSubmit:
-                    (Map<EntitiesServiceProduct, EntitiesProvider> data) =>
-                        context.read<OrderBloc>().add(OrderEventCreate(
-                            data.keys.first, data.values.first.uid)),
-              );
-            }
-            return Center(
-              child: Text('No data available'),
-            );
-          }),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                  'Showing ${tableData.visibleOrders.length} of ${tableData.filteredOrders.length}'),
+              ScrollPages(
+                totalPages: tableData.totalPages,
+                selectedPage: tableData.currentPage,
+                onPageChanged: (page) {
+                  setState(() => tableData.goToPage(page!));
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
