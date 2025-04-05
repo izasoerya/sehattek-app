@@ -162,35 +162,7 @@ class _TableOrderState extends State<TableOrder> {
                 ButtonGeneral(
                   icon: Icon(Icons.add_circle_outline, color: Colors.white),
                   label: Text('Tambahkan'),
-                  onPressed: () => showDialog(
-                    context: context,
-                    builder: (context) => FutureBuilder(
-                        future: ServiceAuth().fetchListProvider(),
-                        builder: (context, snapshot) {
-                          print('snapshot: ${snapshot.data}');
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(
-                              child: Text('Error: ${snapshot.error}'),
-                            );
-                          } else if (snapshot.hasData) {
-                            return NewOrderPopup(
-                              listProvider: snapshot.data!,
-                              onSubmit:
-                                  (Map<EntitiesServiceProduct, EntitiesProvider>
-                                          data) =>
-                                      context.read<OrderBloc>().add(
-                                          OrderEventCreate(data.keys.first,
-                                              data.values.first.uid)),
-                            );
-                          }
-                          return Center(
-                            child: Text('No data available'),
-                          );
-                        }),
-                  ),
+                  onPressed: () => showModalCreateOrder(context),
                 ),
               ],
             ),
@@ -283,6 +255,34 @@ class _TableOrderState extends State<TableOrder> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<dynamic> showModalCreateOrder(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => FutureBuilder(
+          future: ServiceAuth().fetchListProvider(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            } else if (snapshot.hasData) {
+              return NewOrderPopup(
+                listProvider: snapshot.data!,
+                onSubmit:
+                    (Map<EntitiesServiceProduct, EntitiesProvider> data) =>
+                        context.read<OrderBloc>().add(OrderEventCreate(
+                            data.keys.first, data.values.first.uid)),
+              );
+            }
+            return Center(
+              child: Text('No data available'),
+            );
+          }),
     );
   }
 }
