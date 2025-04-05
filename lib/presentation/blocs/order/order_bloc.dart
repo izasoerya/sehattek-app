@@ -12,36 +12,40 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
 
   void _onCreateOrder(OrderEventCreate event, Emitter<OrderState> emit) async {
     emit(OrderStateLoading());
-    try {
-      await ServiceOrder().createOrder(event.order, event.providerId);
+    final res = await ServiceOrder().createOrder(event.order, event.providerId);
+    if (res.isLeft) {
       final res2 = await ServiceOrder().readListOrder(event.providerId);
-      emit(OrderStateSuccess(res2));
-    } catch (e) {
-      emit(OrderStateError('An unexpected error occurred'));
+      if (res2.isLeft) {
+        emit(OrderStateSuccess(res2.left));
+      } else {
+        emit(OrderStateError(res2.right.message));
+      }
+    } else {
+      emit(OrderStateError(res.right.message));
     }
   }
 
   void _onFetchListOrderWithStatus(
       OrderEventFetchListWithStatus event, Emitter<OrderState> emit) async {
     emit(OrderStateLoading());
-    try {
-      final res = await ServiceOrder().readListOrder(event.providerId);
-      emit(OrderStateSuccess(res));
-    } catch (e) {
-      emit(OrderStateError('An unexpected error occurred'));
+    final res = await ServiceOrder().readListOrder(event.providerId);
+    if (res.isLeft) {
+      emit(OrderStateSuccess(res.left));
+    } else {
+      emit(OrderStateError(res.right.message));
     }
   }
 
   void _onUpdateStatusOrder(
       OrderEventUpdateStatus event, Emitter<OrderState> emit) async {
     emit(OrderStateLoading());
-    try {
-      final newOrder = await ServiceOrder()
-          .updateStatusOrder(event.statusType, event.productId);
-      final res = await ServiceOrder().readListOrder(newOrder[0].uidProvider);
-      emit(OrderStateSuccess(res));
-    } catch (e) {
-      emit(OrderStateError('An unexpected error occurred'));
+    final newOrder = await ServiceOrder()
+        .updateStatusOrder(event.statusType, event.productId);
+    final res2 = await ServiceOrder().readListOrder(newOrder.uidProvider);
+    if (res2.isLeft) {
+      emit(OrderStateSuccess(res2.left));
+    } else {
+      emit(OrderStateError(res2.right.message));
     }
   }
 }

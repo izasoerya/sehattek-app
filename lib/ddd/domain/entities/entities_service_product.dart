@@ -1,3 +1,5 @@
+import 'package:sehattek_app/core/utils/error_class.dart';
+
 class EntitiesServiceProduct {
   final String uid;
   final String name;
@@ -19,28 +21,46 @@ class EntitiesServiceProduct {
     required this.createdAt,
   });
 
+  EntitiesServiceProduct copyWith({
+    String? uid,
+    String? name,
+    String? description,
+    String? price,
+    String? customerName,
+    DateTime? orderDate,
+    DateTime? updatedAt,
+    DateTime? createdAt,
+    ErrorWrapper? error,
+  }) {
+    return EntitiesServiceProduct(
+      uid: uid ?? this.uid,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      price: price ?? this.price,
+      customerName: customerName ?? this.customerName,
+      orderDate: orderDate ?? this.orderDate,
+      updatedAt: updatedAt ?? this.updatedAt,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   factory EntitiesServiceProduct.fromJSON(Map<String, dynamic> map) {
-    try {
-      return EntitiesServiceProduct(
-        uid: map['uid']?.toString() ?? 'Unknown UID',
-        name: map['name'] ?? 'Unknown Name',
-        description: map['description'] ?? 'No Description',
-        price: map['price']?.toString() ?? '0',
-        customerName: map['customer_name'] ?? 'Unknown Customer',
-        orderDate: map['order_datetime'] != null
-            ? DateTime.parse(map['order_datetime'])
-            : DateTime.now(),
-        updatedAt: map['updated_at'] != null
-            ? DateTime.parse(map['updated_at'])
-            : DateTime.now(),
-        createdAt: map['created_at'] != null
-            ? DateTime.parse(map['created_at'])
-            : DateTime.now(),
-      );
-    } catch (e) {
-      print('Error parsing JSON: $map, Error: $e');
-      rethrow;
-    }
+    return EntitiesServiceProduct(
+      uid: map['uid']?.toString() ?? 'Unknown UID',
+      name: map['name'] ?? 'Unknown Name',
+      description: map['description'] ?? 'No Description',
+      price: map['price']?.toString() ?? '0',
+      customerName: map['customer_name'] ?? 'Unknown Customer',
+      orderDate: map['order_datetime'] != null
+          ? DateTime.parse(map['order_datetime'])
+          : DateTime.now(),
+      updatedAt: map['updated_at'] != null
+          ? DateTime.parse(map['updated_at'])
+          : DateTime.now(),
+      createdAt: map['created_at'] != null
+          ? DateTime.parse(map['created_at'])
+          : DateTime.now(),
+    );
   }
 
   Map<String, dynamic> toJSON() {

@@ -1,10 +1,24 @@
 import 'package:sehattek_app/core/utils/enumeration.dart';
-import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
 
 class ErrorWrapper {
   final String message;
   final ErrorType? type;
-  final EntitiesServiceProduct? data;
 
-  ErrorWrapper({required this.message, required this.type, this.data});
+  const ErrorWrapper({required this.message, required this.type});
+
+  static ErrorWrapper unknownError(String message) {
+    return ErrorWrapper(message: message, type: ErrorType.unknown);
+  }
+
+  static ErrorWrapper networkError(String message) {
+    return ErrorWrapper(message: message, type: ErrorType.network);
+  }
+
+  static ErrorWrapper serverError(String message) {
+    return ErrorWrapper(message: message, type: ErrorType.server);
+  }
+
+  static ErrorWrapper validationError(String message) {
+    return ErrorWrapper(message: message, type: ErrorType.validation);
+  }
 }
