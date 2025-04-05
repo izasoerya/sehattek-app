@@ -55,7 +55,7 @@ class InfrastructureRunner implements RepoRunner {
   }
 
   @override
-  Future<List<EntitiesServiceRunner>> updateStatusProduct(
+  Future<EntitiesServiceRunner> updateStatusProduct(
       StatusType statusType, String productId) async {
     try {
       final updatedData = await Supabase.instance.client
@@ -64,14 +64,10 @@ class InfrastructureRunner implements RepoRunner {
           .eq('uid_service_product', productId)
           .select()
           .single();
-      final res = await Supabase.instance.client
-          .from('service_runner')
-          .select()
-          .eq('uid_provider', updatedData['uid_provider']);
-      return res.map((e) => EntitiesServiceRunner.fromJSON(e)).toList();
+      return EntitiesServiceRunner.fromJSON(updatedData);
     } on Exception catch (e) {
       print('error updating runner: $e');
-      return [];
+      return throw Exception('Error updating runner: $e');
     }
   }
 
