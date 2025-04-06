@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  sehattek_web:
+    image: izaa/sehattek-app:latest
+    container_name: sehattek-web
+    ports:
+      - "80:80"
+    networks:
+      - supabase_net
+    depends_on:
+      - supabase-db
+
+  supabase-db:
+    image: supabase/postgres:15.8.1.049
+    container_name: supabase-db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./supabase:/docker-entrypoint-initdb.d
+    networks:
+      - supabase_net
+
+  supabase-auth:
+    image: supabase/gotrue:v2.170.0
+    container_name: supabase-auth
+    depends_on:
+      - supabase-db
+    environment:
+      GOTRUE_DB_DRIVER: postgres
+      DB_NAMESPACE: auth
+      GOTRUE_DB_DATABASE_URL: postgres://postgres:postgres@supabase-db:5432/postgres
+      GOTRUE_SITE_URL: http://localhost
+      GOTRUE_JWT_SECRET: your-jwt-secret
+    networks:
+      - supabase_net
+
+  supabase-rest:
+    image: postgrest/postgrest:v12.2.8
+    container_name: supabase-rest
+    depends_on:
+      - supabase-db
+    environment:
+      PGRST_DB_URI: postgres://postgres:postgres@supabase-db:5432/postgres
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_DB_SCHEMA: public
+    networks:
+      - supabase_net
+
+  supabase-realtime:
+    image: supabase/realtime:v2.34.40
+    container_name: supabase-realtime
+    depends_on:
+      - supabase-db
+    environment:
+      DB_HOST: supabase-db
+      DB_NAME: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    networks:
+      - supabase_net
+
+  supabase-studio:
+    image: supabase/studio:20250224-d10db0f
+    container_name: supabase-studio
+    depends_on:
+      - supabase-db
+    ports:
+      - "8088:3000"
+    networks:
+      - supabase_net
+
+volumes:
+  supabase-data:
+
+networks:
+  supabase_net:
+    driver: bridge
