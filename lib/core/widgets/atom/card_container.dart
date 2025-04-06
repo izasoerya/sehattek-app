@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class CardContainer extends StatefulWidget {
   final String icon;
@@ -33,7 +34,7 @@ class _CardContainerState extends State<CardContainer> {
         });
       },
       child: Container(
-        width: 250,
+        width: 17.5.sw,
         height: 190,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -55,16 +56,17 @@ class _CardContainerState extends State<CardContainer> {
             scale: _isHovered ? 1.05 : 1.0, // Scale the card on hover
             duration: Duration(milliseconds: 100),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.asset('icon/${widget.icon}.png', height: 50),
                 SizedBox(height: 8),
                 Text(
                   widget.title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 const SizedBox(height: 8),
                 Text(
