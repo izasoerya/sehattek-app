@@ -4,12 +4,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sehattek_app/core/widgets/atom/button_general.dart';
 import 'package:sehattek_app/core/widgets/atom/custom_table_cell.dart';
 import 'package:sehattek_app/core/widgets/atom/dropdown_table.dart';
-import 'package:sehattek_app/core/widgets/atom/multi_select_dropdown_button.dart';
-import 'package:sehattek_app/core/widgets/atom/table_button.dart';
+import 'package:sehattek_app/core/widgets/atom/multi_select_toggle_button.dart';
 import 'package:sehattek_app/core/widgets/atom/table_header.dart';
+import 'package:sehattek_app/core/widgets/molecule/new_order_popup.dart';
 import 'package:sehattek_app/core/widgets/molecule/scroll_pages.dart';
+import 'package:sehattek_app/ddd/domain/entities/entities_provider.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_status_product.dart';
+import 'package:sehattek_app/ddd/service/service_auth.dart';
+import 'package:sehattek_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:sehattek_app/presentation/blocs/auth/auth_state.dart';
 import 'package:sehattek_app/presentation/blocs/order/order_bloc.dart';
 import 'package:sehattek_app/presentation/blocs/order/order_event.dart';
 
@@ -36,13 +40,8 @@ class TableRowData {
     return filteredOrders.sublist(start, end);
   }
 
-  void updateFilter(List<String> newFilter) {
-    filter = newFilter;
-  }
-
-  void goToPage(int page) {
-    currentPage = page;
-  }
+  void updateFilter(List<String> newFilter) => filter = newFilter;
+  void goToPage(int page) => currentPage = page;
 }
 
 class TableOrder extends StatefulWidget {
@@ -113,31 +112,25 @@ class _TableOrderState extends State<TableOrder> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  TableButton(
-                    child: Row(
-                      children: [
-                        Icon(Icons.upload, color: Colors.grey),
-                        const SizedBox(width: 10),
-                        Text('Export Data'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  MultiSelectDropdownButton(
-                    items: ['Name', 'Description', 'Price', 'Date', 'Status'],
-                    selectedItems: tableData.filter,
-                    onSelectionChanged: (selected) {
-                      setState(() => tableData.updateFilter(selected));
-                    },
-                  ),
-                ],
+              MultiSelectToggleButton(
+                items: ['Name', 'Description', 'Price', 'Date', 'Status'],
+                selectedItems: tableData.filter,
+                onSelectionChanged: (selected) {
+                  setState(() => tableData.updateFilter(selected));
+                },
               ),
-              ButtonGeneral(
-                icon: Icon(Icons.add_circle_outline, color: Colors.white),
-                label: Text('Tambahkan'),
-                onPressed: () {},
+              Builder(
+                builder: (context) {
+                  final authState = context.read<AuthenticationBloc>().state;
+                  if (authState is UserLoggedIn && authState.admin != null) {
+                    return ButtonGeneral(
+                      icon: Icon(Icons.add_circle_outline, color: Colors.white),
+                      label: Text('Tambahkan'),
+                      onPressed: () => showModalCreateOrder(context),
+                    );
+                  }
+                  return SizedBox();
+                },
               ),
             ],
           ),
@@ -189,4 +182,31 @@ class _TableOrderState extends State<TableOrder> {
       ],
     );
   }
+}
+
+Future<dynamic> showModalCreateOrder(BuildContext context) {
+  return showDialog(
+    context: context,
+    builder: (context) => FutureBuilder(
+        future: ServiceAuth().fetchListProvider(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          } else if (snapshot.hasData) {
+            return NewOrderPopup(
+              listProvider: snapshot.data!,
+              onSubmit: (Map<EntitiesServiceProduct, EntitiesProvider> data) =>
+                  context.read<OrderBloc>().add(
+                      OrderEventCreate(data.keys.first, data.values.first.uid)),
+            );
+          }
+          return Center(
+            child: Text('No data available'),
+          );
+        }),
+  );
 }
