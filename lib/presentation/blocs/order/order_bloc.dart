@@ -8,6 +8,7 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
     on<OrderEventCreate>(_onCreateOrder);
     on<OrderEventUpdateStatus>(_onUpdateStatusOrder);
     on<OrderEventFetchListWithStatus>(_onFetchListOrderWithStatus);
+    on<OrderEventUpdateRunnerProviderId>(_onUpdateRunnerProviderId);
   }
 
   void _onCreateOrder(OrderEventCreate event, Emitter<OrderState> emit) async {
@@ -46,6 +47,19 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
       emit(OrderStateSuccess(res2.left));
     } else {
       emit(OrderStateError(res2.right.message));
+    }
+  }
+
+  void _onUpdateRunnerProviderId(
+      OrderEventUpdateRunnerProviderId event, Emitter<OrderState> emit) async {
+    emit(OrderStateLoading());
+    final res = await ServiceOrder()
+        .updateRunnerProviderId(event.newProviderId, event.productId);
+    final res2 = await ServiceOrder().readListOrder(event.userId);
+    if (res.isLeft) {
+      emit(OrderStateSuccess(res2.left));
+    } else {
+      emit(OrderStateError(res.right.message));
     }
   }
 }

@@ -48,10 +48,19 @@ class InfrastructureRunner implements RepoRunner {
 
   @override
   Future<EntitiesServiceRunner> updateRunner(
-      EntitiesServiceRunner runner) async {
-    // TODO: implement updateRunner
-
-    throw UnimplementedError();
+      String productId, String providerId) async {
+    try {
+      final res = await Supabase.instance.client
+          .from('service_runner')
+          .update({'uid_provider': providerId})
+          .eq('uid_service_product', productId)
+          .select()
+          .single();
+      return EntitiesServiceRunner.fromJSON(res);
+    } catch (e) {
+      print('error updating runner: $e');
+      return throw Exception('Error updating runner: $e');
+    }
   }
 
   @override

@@ -8,6 +8,7 @@ import 'package:sehattek_app/core/widgets/atom/multi_select_toggle_button.dart';
 import 'package:sehattek_app/core/widgets/atom/table_header.dart';
 import 'package:sehattek_app/core/widgets/molecule/new_order_popup.dart';
 import 'package:sehattek_app/core/widgets/molecule/scroll_pages.dart';
+import 'package:sehattek_app/ddd/domain/entities/entities_admin.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_provider.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_status_product.dart';
@@ -226,7 +227,22 @@ class _TableOrderState extends State<TableOrder> {
                     );
                   }).toList(),
                   onChanged: (String? newUid) {
-                    print('Selected provider UID: $newUid');
+                    final authUser = context.read<AuthenticationBloc>().state;
+                    EntitiesProvider? user;
+                    EntitiesAdmin? admin;
+                    if (authUser is UserLoggedIn) {
+                      user = authUser.user;
+                      admin = authUser.admin;
+                    }
+                    print(
+                        'Selected Provider: $newUid, product: ${product.uid}');
+                    context.read<OrderBloc>().add(
+                          OrderEventUpdateRunnerProviderId(
+                            newUid!,
+                            user != null ? user.uid : admin!.uid,
+                            product.uid,
+                          ),
+                        );
                   },
                 ),
               ),

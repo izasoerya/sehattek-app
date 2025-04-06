@@ -95,4 +95,11 @@ class ServiceOrder {
         await InfrastructureRunner().updateStatusProduct(statusType, productId);
     return res;
   }
+
+  Future<Either<EntitiesServiceRunner, ErrorWrapper>> updateRunnerProviderId(
+      String providerId, String productId) async {
+    final res =
+        await InfrastructureRunner().updateRunner(productId, providerId);
+    return Left(res);
+  }
 }

@@ -34,3 +34,12 @@ class OrderEventUpdateStatus extends OrderEvent {
 
   OrderEventUpdateStatus(this.statusType, this.productId);
 }
+
+class OrderEventUpdateRunnerProviderId extends OrderEvent {
+  final String newProviderId;
+  final String userId;
+  final String productId;
+
+  OrderEventUpdateRunnerProviderId(
+      this.newProviderId, this.userId, this.productId);
+}
