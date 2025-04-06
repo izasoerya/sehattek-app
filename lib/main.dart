@@ -4,17 +4,18 @@ import 'package:sehattek_app/presentation/blocs/order/order_bloc.dart';
 import 'package:sehattek_app/presentation/layout/theme.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import 'package:sehattek_app/presentation/router/router.dart';
 
+const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+
 Future<void> main() async {
-  await dotenv.load(fileName: ".env");
   await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+    url: (supabaseUrl),
+    anonKey: (supabaseAnonKey),
   );
   runApp(const MainApp());
 }

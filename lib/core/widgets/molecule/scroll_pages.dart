@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sehattek_app/core/widgets/atom/page_button.dart';
 import 'package:sizer/sizer.dart';
-import 'dart:math';
 
 class ScrollPages extends StatefulWidget {
   final int totalPages;
@@ -25,7 +24,6 @@ class _ScrollPagesState extends State<ScrollPages> {
 
   /// Returns a list of three page numbers to display based on selectedPage.
   List<int> get visiblePages {
-    // print('totalPages: $totalPages, selectedPage: $selectedPage');
     if (totalPages <= 3) {
       return List.generate(totalPages, (index) => index + 1);
     } else if (selectedPage <= 2) {
@@ -38,59 +36,53 @@ class _ScrollPagesState extends State<ScrollPages> {
   }
 
   void _updatePage(int newPage) {
-    selectedPage = newPage;
+    setState(() {
+      selectedPage = newPage;
+    });
     widget.onPageChanged(selectedPage);
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 25.w,
+    final double iconSize =
+        MediaQuery.of(context).size.width < 600 ? 12.sp : 15.sp;
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Spacer(),
-          // Double left arrow: Go to first page
           IconButton(
             icon: const Icon(Icons.first_page),
-            onPressed: () => _updatePage(1),
+            iconSize: iconSize,
+            onPressed: selectedPage > 1 ? () => _updatePage(1) : null,
           ),
-          // Single left arrow: Previous page
           IconButton(
             icon: const Icon(Icons.chevron_left),
-            onPressed: () => _updatePage(max(selectedPage - 1, 1)),
+            iconSize: iconSize,
+            onPressed:
+                selectedPage > 1 ? () => _updatePage(selectedPage - 1) : null,
           ),
-          // Animated group of page buttons (only 3 visible at a time)
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 100),
-            transitionBuilder: (child, animation) => SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0.1, 0),
-                end: const Offset(0, 0),
-              ).animate(animation),
-              child: child,
-            ),
-            child: Row(
-              // The key changes when visiblePages changes so AnimatedSwitcher animates.
-              key: ValueKey<List<int>>(visiblePages),
-              children: visiblePages.map((pageNumber) {
-                return PageButton(
+          ...visiblePages.map((pageNumber) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: PageButton(
                   pageNumber: pageNumber,
                   isSelected: pageNumber == selectedPage,
                   onPressed: () => _updatePage(pageNumber),
-                );
-              }).toList(),
-            ),
-          ),
-          // Single right arrow: Next page
+                ),
+              )),
           IconButton(
             icon: const Icon(Icons.chevron_right),
-            onPressed: () => _updatePage(min(selectedPage + 1, totalPages)),
+            iconSize: iconSize,
+            onPressed: selectedPage < totalPages
+                ? () => _updatePage(selectedPage + 1)
+                : null,
           ),
-          // Double right arrow: Go to last page
           IconButton(
             icon: const Icon(Icons.last_page),
-            onPressed: () => _updatePage(totalPages),
+            iconSize: iconSize,
+            onPressed: selectedPage < totalPages
+                ? () => _updatePage(totalPages)
+                : null,
           ),
         ],
       ),

@@ -15,7 +15,7 @@ class AuthContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return IntrinsicHeight(
       child: Container(
-        width: 25.sw,
+        width: width ?? 25.w,
         padding: const EdgeInsets.only(
           left: 30,
           right: 30,

@@ -38,7 +38,7 @@ const Map<String, FlexColumnWidth> columnFlexWidths = {
   'Price': FlexColumnWidth(2),
   'Date': FlexColumnWidth(1.5),
   'Status': FlexColumnWidth(2),
-  'Handler': FlexColumnWidth(3),
+  'Handler': FlexColumnWidth(4),
 };
 
 class TableRowData {
@@ -202,14 +202,11 @@ class _TableOrderState extends State<TableOrder> {
           break;
         case 'Status':
           row.add(CustomTableCell(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: DropdownTable(
-                statusType: status.statusType,
-                onChanged: (newStatus) => context.read<OrderBloc>().add(
-                      OrderEventUpdateStatus(newStatus, product.uid),
-                    ),
-              ),
+            child: DropdownTable(
+              statusType: status.statusType,
+              onChanged: (newStatus) => context.read<OrderBloc>().add(
+                    OrderEventUpdateStatus(newStatus, product.uid),
+                  ),
             ),
           ));
           break;
@@ -343,7 +340,12 @@ class _TableOrderState extends State<TableOrder> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                  'Showing ${tableData.visibleOrders.length} of ${tableData.filteredOrders.length}'),
+                'Showing ${tableData.visibleOrders.length} of ${tableData.filteredOrders.length}',
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      fontSize: 12.sp,
+                      color: Colors.grey.shade600,
+                    ),
+              ),
               ScrollPages(
                 totalPages: tableData.totalPages,
                 selectedPage: tableData.currentPage,

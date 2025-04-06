@@ -19,6 +19,7 @@ class _DropdownTableState extends State<DropdownTable> {
     return DropdownButton<String>(
       value: widget.statusType.status,
       icon: SizedBox(),
+      isDense: true,
       underline: SizedBox(),
       items: StatusType.values.map((e) {
         return DropdownMenuItem<String>(
@@ -26,7 +27,7 @@ class _DropdownTableState extends State<DropdownTable> {
           child: Container(
             height: 30,
             alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(horizontal: 10.0),
+            padding: EdgeInsets.symmetric(horizontal: 1.sw),
             decoration: BoxDecoration(
               color: () {
                 if (e == StatusType.pending) {

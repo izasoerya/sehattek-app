@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class TableButton extends StatelessWidget {
   final Widget child;
@@ -9,7 +10,8 @@ class TableButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IntrinsicWidth(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 1.sw, vertical: 1.sh),
         decoration: BoxDecoration(
           color: Colors.grey.shade200,
           borderRadius: BorderRadius.circular(5),

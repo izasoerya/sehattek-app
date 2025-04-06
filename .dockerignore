@@ -1,0 +1,10 @@
+build/
+!build/web
+.git
+*.md
+*.lock
+.idea
+*.iml
+.flutter-plugins
+.dart_tool
+.assets/.env

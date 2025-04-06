@@ -18,7 +18,7 @@ class _CustomTableCellState extends State<CustomTableCell> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 7.5),
+        padding: EdgeInsets.symmetric(horizontal: 1.sw, vertical: 2.sh),
         alignment: Alignment.centerLeft,
         decoration: BoxDecoration(),
         child: Row(

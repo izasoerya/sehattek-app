@@ -5,12 +5,16 @@ class CardContainer extends StatefulWidget {
   final String icon;
   final String title;
   final String value;
+  final double? fontSizeTitle;
+  final double? fontSizeValue;
 
   const CardContainer({
     super.key,
     required this.icon,
     required this.title,
     required this.value,
+    this.fontSizeTitle,
+    this.fontSizeValue,
   });
 
   @override
@@ -61,17 +65,23 @@ class _CardContainerState extends State<CardContainer> {
               children: [
                 Image.asset('icon/${widget.icon}.png', height: 50),
                 SizedBox(height: 8),
-                Text(
-                  widget.title,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
+                Expanded(
+                  child: Text(
+                    widget.title,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: widget.fontSizeTitle ?? 13.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                    overflow: TextOverflow.visible,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   widget.value,
-                  style: Theme.of(context).textTheme.headlineLarge,
+                  style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                        fontSize: widget.fontSizeValue ?? 20.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ],
             ),
