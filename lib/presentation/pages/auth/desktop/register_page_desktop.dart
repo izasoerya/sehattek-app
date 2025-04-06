@@ -10,6 +10,7 @@ import 'package:sehattek_app/core/widgets/molecule/footer.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_event.dart';
 import 'package:sehattek_app/presentation/router/router.dart';
+import 'package:sizer/sizer.dart';
 
 class RegisterPageDesktop extends StatefulWidget {
   const RegisterPageDesktop({super.key});
@@ -35,7 +36,6 @@ class _RegisterPageDesktopState extends State<RegisterPageDesktop> {
         Flexible(
           child: Center(
             child: AuthContainer(
-              height: 450,
               child: Form(
                 key: _formKey, // Form key to handle validation
                 child: Column(
@@ -54,8 +54,9 @@ class _RegisterPageDesktopState extends State<RegisterPageDesktop> {
                       ],
                     ),
                     const Spacer(),
+                    SizedBox(height: 2.h),
                     ToggleButtonGeneral(onChanged: adminCallback),
-                    const Spacer(),
+                    SizedBox(height: 2.h),
                     TextInput(
                       controller: _name,
                       label: 'Nama',
@@ -87,7 +88,7 @@ class _RegisterPageDesktopState extends State<RegisterPageDesktop> {
                       type: TextInputType.visiblePassword,
                       validator: TextfieldValidator.validatePassword,
                     ),
-                    const Spacer(),
+                    SizedBox(height: 2.h),
                     ButtonGeneral(
                       label: const Text('Sign Up'),
                       onPressed: () {
