@@ -58,4 +58,12 @@ class ServiceAuth {
     final res = await InfrastructureAuth().readListUser(UserType.provider);
     return res;
   }
+
+  Future<EntitiesProvider?> fetchProviderByUid(String uid) async {
+    final res = await InfrastructureAuth().readListUser(UserType.provider);
+    final provider = res.firstWhere(
+      (provider) => provider.uid == uid,
+    );
+    return provider;
+  }
 }

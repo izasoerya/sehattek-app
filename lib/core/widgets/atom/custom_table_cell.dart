@@ -18,7 +18,6 @@ class _CustomTableCellState extends State<CustomTableCell> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: 40,
         padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 7.5),
         alignment: Alignment.centerLeft,
         decoration: BoxDecoration(),
@@ -26,11 +25,15 @@ class _CustomTableCellState extends State<CustomTableCell> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             widget.label != null
-                ? Text(
-                    widget.label!,
-                    style: TextStyle(
-                      fontSize: 11.5.sp,
-                      fontWeight: FontWeight.bold,
+                ? Expanded(
+                    child: Text(
+                      widget.label!,
+                      style: TextStyle(
+                        fontSize: 11.5.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
                     ),
                   )
                 : widget.child!,

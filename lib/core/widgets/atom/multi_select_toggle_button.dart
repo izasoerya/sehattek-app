@@ -58,6 +58,7 @@ class _MultiSelectToggleButtonState extends State<MultiSelectToggleButton> {
                             'Price',
                             'Date',
                             'Status'
+                                'Handler',
                           ];
                           _selectedItems.sort((a, b) =>
                               order.indexOf(a).compareTo(order.indexOf(b)));

@@ -32,6 +32,11 @@ class ServiceOrder {
     return res!.left;
   }
 
+  Future<List<EntitiesServiceRunner>> readListRunner(String providerId) async {
+    final res = await InfrastructureRunner().readListRunner(providerId);
+    return res;
+  }
+
   Future<Either<List<EntitiesServiceProduct>, ErrorWrapper>> readListProduct(
       String providerId) async {
     final res = await InfrastructureProduct().readListProduct(providerId);
@@ -39,6 +44,16 @@ class ServiceOrder {
       return Left(res.left);
     } else {
       return Right(ErrorWrapper.unknownError('Error reading list of products'));
+    }
+  }
+
+  Future<Either<EntitiesServiceProduct, ErrorWrapper>> readOrder(
+      String orderId) async {
+    final res = await InfrastructureProduct().readProduct(orderId);
+    if (res.isLeft) {
+      return Left(res.left);
+    } else {
+      return Right(ErrorWrapper.unknownError('Error reading order'));
     }
   }
 
