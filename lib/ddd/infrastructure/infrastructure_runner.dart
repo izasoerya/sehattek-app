@@ -2,9 +2,11 @@ import 'package:sehattek_app/core/utils/enumeration.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_service_runner.dart';
 import 'package:sehattek_app/ddd/domain/repository/repo_runner.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class InfrastructureRunner implements RepoRunner {
   const InfrastructureRunner();
+  final uuid = const Uuid();
 
   @override
   Future<EntitiesServiceRunner> createRunner(
@@ -12,9 +14,16 @@ class InfrastructureRunner implements RepoRunner {
     try {
       final res = await Supabase.instance.client
           .from('service_runner')
-          .insert(runner.toJSON())
+          .insert(runner
+              .copyWith(
+                uid: uuid.v4(),
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+              )
+              .toJSON())
           .select()
           .single();
+      print('res create runner: $res');
       return EntitiesServiceRunner.fromJSON(res);
     } on Exception catch (e) {
       print('Error creating runner: $e');

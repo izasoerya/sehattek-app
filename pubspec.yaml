@@ -17,6 +17,7 @@ dependencies:
   responsive_framework: ^1.5.1
   date_picker_plus: ^4.2.0
   either_dart: ^1.0.0
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:

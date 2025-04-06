@@ -1,3 +1,4 @@
+// table_order.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,7 +9,6 @@ import 'package:sehattek_app/core/widgets/atom/multi_select_toggle_button.dart';
 import 'package:sehattek_app/core/widgets/atom/table_header.dart';
 import 'package:sehattek_app/core/widgets/molecule/new_order_popup.dart';
 import 'package:sehattek_app/core/widgets/molecule/scroll_pages.dart';
-import 'package:sehattek_app/ddd/domain/entities/entities_admin.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_provider.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_status_product.dart';
@@ -19,7 +19,8 @@ import 'package:sehattek_app/presentation/blocs/order/order_bloc.dart';
 import 'package:sehattek_app/presentation/blocs/order/order_event.dart';
 import 'package:sizer/sizer.dart';
 
-const List<String> baseColumnOrder = [
+// === CONFIG ===
+const List<String> defaultColumnOrder = [
   'Name',
   'Description',
   'Price',
@@ -28,17 +29,35 @@ const List<String> baseColumnOrder = [
   'Handler'
 ];
 
+const int defaultItemsPerPage = 10;
+const int defaultStartPage = 1;
+
+const Map<String, FlexColumnWidth> columnFlexWidths = {
+  'Name': FlexColumnWidth(2),
+  'Description': FlexColumnWidth(3),
+  'Price': FlexColumnWidth(2),
+  'Date': FlexColumnWidth(1.5),
+  'Status': FlexColumnWidth(2),
+  'Handler': FlexColumnWidth(3),
+};
+
 class TableRowData {
   final List<Map<EntitiesServiceProduct, EntitiesStatusProduct>?> rawOrders;
   final List<Map<String, String>> mapIdtoName;
 
-  List<String> filter = List.from(baseColumnOrder);
-  int itemsPerPage = 10;
-  int currentPage = 1;
+  List<String> filter;
+  int itemsPerPage;
+  int currentPage;
   String? sortColumn;
   bool sortAscending = true;
 
-  TableRowData({required this.rawOrders, required this.mapIdtoName});
+  TableRowData({
+    required this.rawOrders,
+    required this.mapIdtoName,
+    this.itemsPerPage = defaultItemsPerPage,
+    this.currentPage = defaultStartPage,
+    List<String>? filter,
+  }) : filter = filter ?? List.from(defaultColumnOrder);
 
   List<Map<EntitiesServiceProduct, EntitiesStatusProduct>> get filteredOrders {
     final orders = rawOrders
@@ -53,7 +72,13 @@ class TableRowData {
         int compareResult = 0;
         switch (sortColumn) {
           case 'Name':
-            compareResult = productA.name.compareTo(productB.name);
+            compareResult = productA.name
+                .toLowerCase()
+                .compareTo(productB.name.toLowerCase());
+            if (compareResult == 0) {
+              compareResult =
+                  productB.orderDate.compareTo(productA.orderDate); // fallback
+            }
             break;
           case 'Description':
             compareResult =
@@ -63,7 +88,8 @@ class TableRowData {
             compareResult = productA.price.compareTo(productB.price);
             break;
           case 'Date':
-            compareResult = productA.orderDate.compareTo(productB.orderDate);
+            compareResult =
+                productB.orderDate.compareTo(productA.orderDate); // DESC
             break;
           case 'Status':
             compareResult = a.values.first.statusType
@@ -76,7 +102,6 @@ class TableRowData {
                 .compareTo(b.values.first.uid.toString());
             break;
         }
-
         return sortAscending ? compareResult : -compareResult;
       });
     }
@@ -117,52 +142,38 @@ class TableOrder extends StatefulWidget {
 
 class _TableOrderState extends State<TableOrder> {
   late TableRowData tableData;
-
   List<EntitiesProvider> providers = [];
-
-  void loadProviders() async {
-    final res = await ServiceAuth().fetchListProvider();
-    setState(() => providers = res);
-  }
+  bool isAdmin = false;
 
   @override
   void initState() {
     super.initState();
+    final authState = context.read<AuthenticationBloc>().state;
+    isAdmin = authState is UserLoggedIn && authState.admin != null;
+
+    final initialFilter = List.from(defaultColumnOrder);
+    if (!isAdmin) initialFilter.remove('Handler');
+
     tableData = TableRowData(
       rawOrders: widget.listOrder,
       mapIdtoName: widget.mapIdtoName,
+      filter: initialFilter.cast<String>(),
     );
+
     tableData.sortByColumn('Name');
-    loadProviders();
+    _loadProviders();
+  }
+
+  Future<void> _loadProviders() async {
+    final res = await ServiceAuth().fetchListProvider();
+    setState(() => providers = res);
   }
 
   Map<int, TableColumnWidth> get columnWidths {
     final widths = <int, TableColumnWidth>{};
-
     for (int i = 0; i < tableData.filter.length; i++) {
-      final column = tableData.filter[i];
-      switch (column) {
-        case 'Name':
-          widths[i] = const FlexColumnWidth(2);
-          break;
-        case 'Description':
-          widths[i] = const FlexColumnWidth(3);
-          break;
-        case 'Price':
-          widths[i] = const FlexColumnWidth(2);
-          break;
-        case 'Date':
-          widths[i] = const FlexColumnWidth(2);
-          break;
-        case 'Status':
-          widths[i] = const FlexColumnWidth(2);
-          break;
-        case 'Handler':
-          widths[i] = const FlexColumnWidth(3);
-          break;
-        default:
-          widths[i] = const FlexColumnWidth(1);
-      }
+      widths[i] =
+          columnFlexWidths[tableData.filter[i]] ?? const FlexColumnWidth(1);
     }
     return widths;
   }
@@ -171,7 +182,7 @@ class _TableOrderState extends State<TableOrder> {
       EntitiesServiceProduct product, EntitiesStatusProduct status) {
     List<Widget> row = [];
 
-    for (final column in baseColumnOrder) {
+    for (final column in defaultColumnOrder) {
       if (!tableData.filter.contains(column)) continue;
 
       switch (column) {
@@ -186,73 +197,74 @@ class _TableOrderState extends State<TableOrder> {
           break;
         case 'Date':
           row.add(CustomTableCell(
-              label: product.orderDate.toString().substring(0, 10)));
+            label: product.orderDate.toString().substring(0, 10),
+          ));
           break;
         case 'Status':
           row.add(CustomTableCell(
-            child: DropdownTable(
-              statusType: status.statusType,
-              onChanged: (newStatus) => context.read<OrderBloc>().add(
-                    OrderEventUpdateStatus(newStatus, product.uid),
-                  ),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: DropdownTable(
+                statusType: status.statusType,
+                onChanged: (newStatus) => context.read<OrderBloc>().add(
+                      OrderEventUpdateStatus(newStatus, product.uid),
+                    ),
+              ),
             ),
           ));
           break;
         case 'Handler':
           final handlerUid = widget.mapIdtoName.firstWhere(
-              (map) => map['uid'] == product.uid,
-              orElse: () => {'handlerUid': ''})['handlerUid'];
+            (map) => map['uid'] == product.uid,
+            orElse: () => {'handlerUid': ''},
+          )['handlerUid'];
           final isValid = providers.any((p) => p.uid == handlerUid);
 
           row.add(
-            CustomTableCell(
-              child: Expanded(
-                child: DropdownButtonFormField<String>(
-                  value: isValid ? handlerUid : null,
-                  isExpanded: true,
-                  isDense: true,
-                  decoration: const InputDecoration(border: InputBorder.none),
-                  items: providers.map((provider) {
-                    return DropdownMenuItem<String>(
-                      value: provider.uid,
-                      child: Text(
-                        '${provider.name} (${provider.email})',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              fontSize: 10.5.sp,
-                            ),
-                        softWrap: true, // Allow text to wrap
-                        maxLines: 2, // Limit to 2 lines
-                        overflow: TextOverflow.visible,
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (String? newUid) {
-                    final authUser = context.read<AuthenticationBloc>().state;
-                    EntitiesProvider? user;
-                    EntitiesAdmin? admin;
-                    if (authUser is UserLoggedIn) {
-                      user = authUser.user;
-                      admin = authUser.admin;
-                    }
-                    print(
-                        'Selected Provider: $newUid, product: ${product.uid}');
-                    context.read<OrderBloc>().add(
-                          OrderEventUpdateRunnerProviderId(
-                            newUid!,
-                            user != null ? user.uid : admin!.uid,
-                            product.uid,
-                          ),
-                        );
-                  },
+            SizedBox(
+              width: 50,
+              child: CustomTableCell(
+                child: Expanded(
+                  child: DropdownButtonFormField<String>(
+                    value: isValid ? handlerUid : null,
+                    isDense: true,
+                    isExpanded: true,
+                    decoration: const InputDecoration(border: InputBorder.none),
+                    items: providers
+                        .map((provider) => DropdownMenuItem<String>(
+                              value: provider.uid,
+                              child: Text(
+                                '${provider.name} (${provider.email})',
+                                maxLines: 2,
+                                style: TextStyle(fontSize: 10.5.sp),
+                                softWrap: true,
+                                overflow: TextOverflow.visible,
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (String? newUid) {
+                      final authUser = context.read<AuthenticationBloc>().state;
+                      final currentUserUid = authUser is UserLoggedIn
+                          ? authUser.user?.uid ?? authUser.admin?.uid
+                          : null;
+                      if (newUid != null && currentUserUid != null) {
+                        context.read<OrderBloc>().add(
+                              OrderEventUpdateRunnerProviderId(
+                                newUid,
+                                currentUserUid,
+                                product.uid,
+                              ),
+                            );
+                      }
+                    },
+                  ),
                 ),
               ),
             ),
           );
-
           break;
       }
     }
-
     return row;
   }
 
@@ -270,34 +282,32 @@ class _TableOrderState extends State<TableOrder> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               MultiSelectToggleButton(
-                items: baseColumnOrder,
+                items: isAdmin
+                    ? defaultColumnOrder
+                    : defaultColumnOrder.where((e) => e != 'Handler').toList(),
                 selectedItems: tableData.filter,
-                onSelectionChanged: (selected) {
-                  setState(() => tableData.updateFilter(selected));
-                },
+                onSelectionChanged: (selected) =>
+                    setState(() => tableData.updateFilter(selected)),
               ),
-              Builder(
-                builder: (context) {
-                  final authState = context.read<AuthenticationBloc>().state;
-                  if (authState is UserLoggedIn && authState.admin != null) {
-                    return ButtonGeneral(
-                      icon: Icon(Icons.add_circle_outline, color: Colors.white),
-                      label: Text('Tambahkan'),
-                      onPressed: () => showModalCreateOrder(context),
-                    );
-                  }
-                  return SizedBox();
-                },
-              ),
+              if (isAdmin)
+                ButtonGeneral(
+                  icon: Icon(Icons.add_circle_outline, color: Colors.white),
+                  label: Text('Tambahkan'),
+                  onPressed: () => showModalCreateOrder(context),
+                ),
             ],
           ),
         ),
         Table(
           columnWidths: columnWidths,
+          border: TableBorder.all(
+            color: Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(10.0),
+          ),
           children: [
             TableRow(
               decoration: BoxDecoration(color: Colors.grey.shade200),
-              children: baseColumnOrder
+              children: defaultColumnOrder
                   .where((header) => tableData.filter.contains(header))
                   .map((header) => GestureDetector(
                         onTap: () =>
@@ -321,13 +331,13 @@ class _TableOrderState extends State<TableOrder> {
           ],
         ),
         Container(
+          width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 12.5, horizontal: 20),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(10.0)),
             border: Border(
-              top: BorderSide(color: Colors.grey.shade200, width: 2.5),
-            ),
+                top: BorderSide(color: Colors.grey.shade200, width: 2.5)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -337,9 +347,8 @@ class _TableOrderState extends State<TableOrder> {
               ScrollPages(
                 totalPages: tableData.totalPages,
                 selectedPage: tableData.currentPage,
-                onPageChanged: (page) {
-                  setState(() => tableData.goToPage(page!));
-                },
+                onPageChanged: (page) =>
+                    setState(() => tableData.goToPage(page!)),
               ),
             ],
           ),
@@ -353,21 +362,24 @@ Future<dynamic> showModalCreateOrder(BuildContext context) {
   return showDialog(
     context: context,
     builder: (context) => FutureBuilder(
-        future: ServiceAuth().fetchListProvider(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            return NewOrderPopup(
+      future: ServiceAuth().fetchListProvider(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (snapshot.hasData) {
+          return NewOrderPopup(
               listProvider: snapshot.data!,
-              onSubmit: (Map<EntitiesServiceProduct, EntitiesProvider> data) =>
-                  context.read<OrderBloc>().add(
-                      OrderEventCreate(data.keys.first, data.values.first.uid)),
-            );
-          }
-          return Center(child: Text('No data available'));
-        }),
+              onSubmit: (Map<EntitiesServiceProduct, EntitiesProvider> data) {
+                context.read<OrderBloc>().add(
+                      OrderEventCreate(data.keys.first, data.values.first.uid),
+                    );
+                Navigator.of(context).pop();
+              });
+        }
+        return Center(child: Text('No data available'));
+      },
+    ),
   );
 }

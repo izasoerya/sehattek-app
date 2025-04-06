@@ -15,6 +15,24 @@ class EntitiesServiceRunner {
     required this.createdAt,
   });
 
+  EntitiesServiceRunner copyWith({
+    String? uid,
+    String? uidProvider,
+    String? uidStatusProduct,
+    String? uidServiceProduct,
+    DateTime? updatedAt,
+    DateTime? createdAt,
+  }) {
+    return EntitiesServiceRunner(
+      uid: uid ?? this.uid,
+      uidProvider: uidProvider ?? this.uidProvider,
+      uidStatusProduct: uidStatusProduct ?? this.uidStatusProduct,
+      uidServiceProduct: uidServiceProduct ?? this.uidServiceProduct,
+      updatedAt: updatedAt ?? this.updatedAt,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
   factory EntitiesServiceRunner.fromJSON(Map<String, dynamic> map) {
     return EntitiesServiceRunner(
       uid: map["uid"],

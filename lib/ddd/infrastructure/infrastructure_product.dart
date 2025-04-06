@@ -3,17 +3,26 @@ import 'package:either_dart/either.dart';
 import 'package:sehattek_app/core/utils/error_class.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_service_product.dart';
 import 'package:sehattek_app/ddd/domain/repository/repo_product.dart';
+import 'package:uuid/uuid.dart';
 
 class InfrastructureProduct implements RepoProduct {
+  final uuid = const Uuid();
   @override
   Future<Either<EntitiesServiceProduct, ErrorWrapper>> createProduct(
       EntitiesServiceProduct product) async {
     try {
       final res = await Supabase.instance.client
           .from('service_product')
-          .insert(product.toJSON())
+          .insert(product
+              .copyWith(
+                uid: uuid.v4(),
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+              )
+              .toJSON())
           .select()
           .single();
+      print('res create product: $res');
       return Left(EntitiesServiceProduct.fromJSON(res));
     } on Exception catch (e) {
       print('Error creating product: $e');

@@ -144,7 +144,7 @@ class _NewOrderPopupState extends State<NewOrderPopup> {
                     onPressed: () {
                       widget.onSubmit({
                         EntitiesServiceProduct(
-                          uid: '03b24cf4-f010-45e2-ac35-61216e8fd599',
+                          uid: '',
                           name: _orderNameController.text,
                           description: _descriptionController.text,
                           price: _priceController.text,

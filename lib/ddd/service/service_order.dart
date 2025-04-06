@@ -11,25 +11,30 @@ import 'package:sehattek_app/ddd/infrastructure/infrastructure_status.dart';
 class ServiceOrder {
   Future<Either<EntitiesServiceProduct, ErrorWrapper>> createOrder(
       EntitiesServiceProduct order, String providerId) async {
-    final res = await InfrastructureProduct().createProduct(order).then(
-      (value) async {
-        if (value.isLeft) {
-          await InfrastructureRunner().createRunner(
-            EntitiesServiceRunner(
-              uid: '03b24cf4-f010-45e2-ac35-61216e8fd599',
-              uidServiceProduct: value.left.uid,
-              uidProvider: providerId,
-              uidStatusProduct: StatusType.pending.uid,
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
-            ),
-          );
-        } else {
-          return Right(ErrorWrapper.unknownError('Error creating order'));
-        }
-      },
-    );
-    return res!.left;
+    final productResult = await InfrastructureProduct().createProduct(order);
+
+    if (productResult.isLeft) {
+      // Product creation successful
+      final createdProduct = productResult.left;
+
+      // Create the runner
+      await InfrastructureRunner().createRunner(
+        EntitiesServiceRunner(
+          uid: '',
+          uidServiceProduct: createdProduct.uid,
+          uidProvider: providerId,
+          uidStatusProduct: StatusType.pending.uid,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      );
+
+      // Return the created product
+      return Left(createdProduct);
+    } else {
+      // Product creation failed, return the error
+      return Right(ErrorWrapper.unknownError('Error creating order'));
+    }
   }
 
   Future<List<EntitiesServiceRunner>> readListRunner(String providerId) async {

@@ -41,7 +41,12 @@ class _MultiSelectToggleButtonState extends State<MultiSelectToggleButton> {
                   children: widget.items.map((item) {
                     final bool isSelected = _selectedItems.contains(item);
                     return CheckboxListTile(
-                      title: Text(item),
+                      title: Text(item,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.bold,
+                                  )),
                       value: isSelected,
                       onChanged: (bool? checked) {
                         setState(() {

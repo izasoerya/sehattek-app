@@ -14,8 +14,10 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
   void _onCreateOrder(OrderEventCreate event, Emitter<OrderState> emit) async {
     emit(OrderStateLoading());
     final res = await ServiceOrder().createOrder(event.order, event.providerId);
+    print('res create order: $res');
     if (res.isLeft) {
       final res2 = await ServiceOrder().readListOrder(event.providerId);
+      print('res2 read order: $res2');
       if (res2.isLeft) {
         emit(OrderStateSuccess(res2.left));
       } else {

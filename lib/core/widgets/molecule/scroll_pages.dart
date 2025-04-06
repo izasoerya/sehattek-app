@@ -45,10 +45,11 @@ class _ScrollPagesState extends State<ScrollPages> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 20.w,
+      width: 25.w,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Spacer(),
           // Double left arrow: Go to first page
           IconButton(
             icon: const Icon(Icons.first_page),
