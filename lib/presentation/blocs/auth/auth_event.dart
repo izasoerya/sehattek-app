@@ -28,3 +28,5 @@ class UserLoggedInEvent extends AuthenticationEvent {
 }
 
 class UserLoggedOutEvent extends AuthenticationEvent {}
+
+class CheckSessionEvent extends AuthenticationEvent {}

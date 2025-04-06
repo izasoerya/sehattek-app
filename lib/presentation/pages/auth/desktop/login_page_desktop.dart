@@ -12,6 +12,7 @@ import 'package:sehattek_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_event.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_state.dart';
 import 'package:sehattek_app/presentation/router/router.dart';
+import 'package:sizer/sizer.dart';
 
 class LoginPageDesktop extends StatefulWidget {
   const LoginPageDesktop({super.key});
@@ -27,6 +28,12 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
 
   bool admin = true;
   void adminCallback(bool isAdmin) => admin = isAdmin;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<AuthenticationBloc>().add(CheckSessionEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,9 +66,9 @@ class _LoginPageDesktopState extends State<LoginPageDesktop> {
                           ),
                         ],
                       ),
-                      const Spacer(),
+                      SizedBox(height: 2.h),
                       ToggleButtonGeneral(onChanged: adminCallback),
-                      const Spacer(),
+                      SizedBox(height: 2.h),
                       TextInput(
                         controller: _email,
                         label: 'Email',

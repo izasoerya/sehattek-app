@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_admin.dart';
 import 'package:sehattek_app/ddd/domain/entities/entities_provider.dart';
@@ -13,10 +11,20 @@ class AuthenticationBloc
   final SupabaseClient _supabaseClient = Supabase.instance.client;
 
   AuthenticationBloc() : super(AuthenticationInitial()) {
+    on<CheckSessionEvent>(_onCheckSession);
+    on<LoginEvent>(_onLogin);
+    on<RegisterEvent>(_onRegister);
+    on<UserLoggedOutEvent>(_onLogOut);
+
+    // Dispatch CheckSessionEvent to handle session checking
+    add(CheckSessionEvent());
+  }
+
+  Future<void> _onCheckSession(
+      CheckSessionEvent event, Emitter<AuthenticationState> emit) async {
     final currentSession = _supabaseClient.auth.currentSession;
     if (currentSession != null) {
-      final bool isAdmin =
-          currentSession.user.userMetadata?['isAdmin'] ?? false;
+      final bool isAdmin = currentSession.user.userMetadata?['admin'] ?? false;
       if (!isAdmin) {
         final provider = EntitiesProvider(
           uid: currentSession.user.id,
@@ -40,46 +48,6 @@ class AuthenticationBloc
     } else {
       emit(AuthenticationUnauthenticated());
     }
-
-    _supabaseClient.auth.onAuthStateChange.listen((data) {
-      final event = data.event;
-      final session = data.session;
-      if (event == AuthChangeEvent.signedIn && session != null) {
-        final bool isAdmin = session.user.userMetadata?['isAdmin'] ?? false;
-
-        if (!isAdmin) {
-          final provider = EntitiesProvider(
-            uid: session.user.id,
-            name: session.user.userMetadata?['username'] ?? 'Unknown User',
-            phoneNumber: session.user.phone ?? '',
-            email: session.user.email ?? '',
-            password: session.accessToken,
-            createdAt: DateTime.parse(session.user.createdAt),
-          );
-          add(UserLoggedInEvent(provider, null));
-        } else {
-          final admin = EntitiesAdmin(
-            uid: session.user.id,
-            name: session.user.userMetadata?['username'] ?? 'Unknown User',
-            email: session.user.email ?? '',
-            password: session.accessToken,
-            createdAt: DateTime.parse(session.user.createdAt),
-          );
-          add(UserLoggedInEvent(null, admin));
-        }
-      } else if (event == AuthChangeEvent.signedOut) {
-        add(UserLoggedOutEvent());
-      }
-    });
-
-    on<LoginEvent>(_onLogin);
-    on<RegisterEvent>(_onRegister);
-    on<UserLoggedInEvent>(
-      (event, emit) => emit(UserLoggedIn(event.user, event.admin)),
-    );
-    on<UserLoggedOutEvent>(
-      (event, emit) => emit(AuthenticationUnauthenticated()),
-    );
   }
 
   Future<void> _onLogin(
@@ -95,17 +63,18 @@ class AuthenticationBloc
         emit(AuthenticationFailure('Invalid credentials'));
         return;
       }
-      if (event.isAdmin) {
+      if (event.isAdmin && response.user!.userMetadata?['admin']) {
         // If the user is an admin, emit UserLoggedIn with admin
         final user = EntitiesAdmin(
           uid: response.user!.id,
-          name: response.user!.userMetadata!['username'] ?? 'Unknown User',
+          name: response.user!.userMetadata?['username'] ?? 'Unknown User',
           email: response.user!.email ?? '',
           password: response.session!.accessToken,
           createdAt: DateTime.parse(response.user!.createdAt),
         );
+        print('User is admin: ${user.name}');
         emit(UserLoggedIn(null, user));
-      } else {
+      } else if (!event.isAdmin && !response.user!.userMetadata?['admin']) {
         // If the user is a provider, emit UserLoggedIn with provider
         final user = EntitiesProvider(
           uid: response.user!.id,
@@ -115,6 +84,7 @@ class AuthenticationBloc
           password: response.session!.accessToken,
           createdAt: DateTime.parse(response.user!.createdAt),
         );
+        print('User is provider: ${user.name}');
         emit(UserLoggedIn(user, null));
       }
     } catch (e) {
@@ -138,6 +108,18 @@ class AuthenticationBloc
     } catch (e) {
       print('Service error: $e');
       emit(AuthenticationFailure(e.toString()));
+    }
+  }
+
+  Future<void> _onLogOut(
+      UserLoggedOutEvent event, Emitter<AuthenticationState> emit) async {
+    emit(AuthenticationLoading());
+    try {
+      await _supabaseClient.auth.signOut();
+      emit(AuthenticationUnauthenticated());
+    } catch (e) {
+      print('Logout error: $e');
+      emit(AuthenticationFailure('An unexpected error occurred'));
     }
   }
 }

@@ -40,7 +40,7 @@ class InfrastructureAuth implements RepoAuth {
         password: password,
       );
       if (response.user == null || response.session == null) {
-        return throw Exception('User or session is null');
+        return throw Exception('There is no user');
       }
     } catch (e) {
       print('Login error: $e');

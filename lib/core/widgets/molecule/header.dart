@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sehattek_app/presentation/blocs/auth/auth_bloc.dart';
+import 'package:sehattek_app/presentation/blocs/auth/auth_event.dart';
 import 'package:sehattek_app/presentation/router/router.dart';
 import 'package:sizer/sizer.dart';
 
 class Header extends StatelessWidget {
+  const Header({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -22,13 +27,7 @@ class Header extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left: Logo
-          // Image.network(
-          //   'https://th.bing.com/th/id/R.c770c604acddc785eb785bbaeba4ba3e?rik=8MBQ9zQJEpBP8A&riu=http%3a%2f%2f4.bp.blogspot.com%2f-Gh9XxDrFKOE%2fULCIFZGmm7I%2fAAAAAAAAAy8%2fh1GYADBLSP4%2fs320%2fLogo%2bUGM%2b(Universitas%2bGadjah%2bMada)-hitam.jpg&ehk=OhRHlVSHSLj05HNYGTmHbdD62e2RHI74LtwMjZ67fgs%3d&risl=&pid=ImgRaw&r=0',
-          //   height: 40,
-          // ),
           Icon(Icons.menu, size: 40),
-
           Row(
             children: [
               TextButton(
@@ -60,7 +59,6 @@ class Header extends StatelessWidget {
               ),
             ],
           ),
-
           Row(
             children: [
               IconButton(
@@ -68,8 +66,33 @@ class Header extends StatelessWidget {
                 onPressed: () {},
               ),
               SizedBox(width: 8),
-              CircleAvatar(
-                radius: 20,
+              PopupMenuButton<String>(
+                position: PopupMenuPosition.under,
+                onSelected: (value) {
+                  if (value == 'profile') {
+                    // router.go('/profile'); // Navigate to the profile page
+                  } else if (value == 'logout') {
+                    context
+                        .read<AuthenticationBloc>()
+                        .add(UserLoggedOutEvent());
+                    router.go('/login'); // Navigate to the login page
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'profile',
+                    child: Text('Profile'),
+                  ),
+                  PopupMenuItem(
+                    value: 'logout',
+                    child: Text('Logout'),
+                  ),
+                ],
+                child: CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.blue,
+                  child: Icon(Icons.person, color: Colors.white),
+                ),
               ),
             ],
           ),
