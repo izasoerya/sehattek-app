@@ -4,11 +4,15 @@ import 'package:sizer/sizer.dart';
 class DropdownGeneral extends StatefulWidget {
   final List<String> providerOptions;
   final void Function(String) selectedProvider;
+  final bool label;
+  final String? initialValue;
 
   const DropdownGeneral({
     super.key,
     required this.providerOptions,
     required this.selectedProvider,
+    this.label = true,
+    this.initialValue,
   });
 
   @override
@@ -16,7 +20,7 @@ class DropdownGeneral extends StatefulWidget {
 }
 
 class _DropdownGeneralState extends State<DropdownGeneral> {
-  String? selectedProvider;
+  late String? selectedProvider = widget.initialValue;
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +28,14 @@ class _DropdownGeneralState extends State<DropdownGeneral> {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Provider Handler',
-          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                fontSize: 10.sp,
-              ),
-        ),
+        widget.label
+            ? Text(
+                'Provider Handler',
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      fontSize: 10.sp,
+                    ),
+              )
+            : const SizedBox(),
         const SizedBox(height: 5),
         Container(
           width: double.infinity,

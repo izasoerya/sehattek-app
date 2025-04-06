@@ -106,6 +106,7 @@ class OrderPageDesktop extends StatelessWidget {
         if (provider != null) {
           mapIdtoName.add({
             'uid': runner.uidServiceProduct,
+            'handlerUid': runner.uidProvider,
             'name': '${provider.name}\n${provider.email}',
           });
         }

@@ -16,6 +16,7 @@ import 'package:sehattek_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:sehattek_app/presentation/blocs/auth/auth_state.dart';
 import 'package:sehattek_app/presentation/blocs/order/order_bloc.dart';
 import 'package:sehattek_app/presentation/blocs/order/order_event.dart';
+import 'package:sizer/sizer.dart';
 
 const List<String> baseColumnOrder = [
   'Name',
@@ -116,6 +117,13 @@ class TableOrder extends StatefulWidget {
 class _TableOrderState extends State<TableOrder> {
   late TableRowData tableData;
 
+  List<EntitiesProvider> providers = [];
+
+  void loadProviders() async {
+    final res = await ServiceAuth().fetchListProvider();
+    setState(() => providers = res);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -124,12 +132,36 @@ class _TableOrderState extends State<TableOrder> {
       mapIdtoName: widget.mapIdtoName,
     );
     tableData.sortByColumn('Name');
+    loadProviders();
   }
 
   Map<int, TableColumnWidth> get columnWidths {
     final widths = <int, TableColumnWidth>{};
+
     for (int i = 0; i < tableData.filter.length; i++) {
-      widths[i] = FlexColumnWidth(i == 1 ? 2 : 1);
+      final column = tableData.filter[i];
+      switch (column) {
+        case 'Name':
+          widths[i] = const FlexColumnWidth(2);
+          break;
+        case 'Description':
+          widths[i] = const FlexColumnWidth(3);
+          break;
+        case 'Price':
+          widths[i] = const FlexColumnWidth(2);
+          break;
+        case 'Date':
+          widths[i] = const FlexColumnWidth(2);
+          break;
+        case 'Status':
+          widths[i] = const FlexColumnWidth(2);
+          break;
+        case 'Handler':
+          widths[i] = const FlexColumnWidth(3);
+          break;
+        default:
+          widths[i] = const FlexColumnWidth(1);
+      }
     }
     return widths;
   }
@@ -166,10 +198,41 @@ class _TableOrderState extends State<TableOrder> {
           ));
           break;
         case 'Handler':
-          final handlerName = tableData.mapIdtoName.firstWhere(
+          final handlerUid = widget.mapIdtoName.firstWhere(
               (map) => map['uid'] == product.uid,
-              orElse: () => {'name': 'Unknown'})['name'];
-          row.add(CustomTableCell(label: handlerName ?? 'Unknown'));
+              orElse: () => {'handlerUid': ''})['handlerUid'];
+          final isValid = providers.any((p) => p.uid == handlerUid);
+
+          row.add(
+            CustomTableCell(
+              child: Expanded(
+                child: DropdownButtonFormField<String>(
+                  value: isValid ? handlerUid : null,
+                  isExpanded: true,
+                  isDense: true,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  items: providers.map((provider) {
+                    return DropdownMenuItem<String>(
+                      value: provider.uid,
+                      child: Text(
+                        '${provider.name} (${provider.email})',
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              fontSize: 10.5.sp,
+                            ),
+                        softWrap: true, // Allow text to wrap
+                        maxLines: 2, // Limit to 2 lines
+                        overflow: TextOverflow.visible,
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newUid) {
+                    print('Selected provider UID: $newUid');
+                  },
+                ),
+              ),
+            ),
+          );
+
           break;
       }
     }
