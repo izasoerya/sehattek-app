@@ -48,15 +48,6 @@ class Header extends StatelessWidget {
                       ),
                 ),
               ),
-              TextButton(
-                onPressed: () => router.go('/report'),
-                child: Text(
-                  'Reports',
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        fontSize: 13.sp,
-                      ),
-                ),
-              ),
             ],
           ),
           Row(

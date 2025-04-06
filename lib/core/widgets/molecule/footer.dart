@@ -15,7 +15,7 @@ class Footer extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '© 2023 Your Company',
+                '© 2023 Trackker Enterprise. All rights reserved.',
                 style: TextStyle(fontSize: 14.0),
               ),
             ],
