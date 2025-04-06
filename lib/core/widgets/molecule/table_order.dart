@@ -123,6 +123,7 @@ class _TableOrderState extends State<TableOrder> {
       rawOrders: widget.listOrder,
       mapIdtoName: widget.mapIdtoName,
     );
+    tableData.sortByColumn('Name');
   }
 
   Map<int, TableColumnWidth> get columnWidths {

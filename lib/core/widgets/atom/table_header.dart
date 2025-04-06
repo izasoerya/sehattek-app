@@ -9,7 +9,7 @@ class TableHeader extends StatelessWidget {
   const TableHeader({
     super.key,
     required this.title,
-    this.isSorted = false,
+    this.isSorted = true,
     this.isAscending = true,
   });
 
@@ -27,6 +27,7 @@ class TableHeader extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
           ),
+          SizedBox(width: 1.sw),
           if (isSorted)
             Icon(
               isAscending ? Icons.arrow_upward : Icons.arrow_downward,
